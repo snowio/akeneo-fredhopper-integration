@@ -3,7 +3,6 @@ namespace SnowIO\AkeneoFredhopper;
 
 use SnowIO\AkeneoDataModel\Attribute;
 use SnowIO\AkeneoDataModel\AttributeValue;
-use SnowIO\AkeneoDataModel\SingleChannelProductData;
 use SnowIO\AkeneoFredhopper\Mapper\FilterableAttributeValueMapper;
 use SnowIO\AkeneoFredhopper\Mapper\LocalizedAttributeValueMapper;
 use SnowIO\AkeneoFredhopper\Mapper\PriceAttributeValueMapper;
@@ -12,7 +11,7 @@ use SnowIO\AkeneoFredhopper\Mapper\SimpleAttributeValueMapper;
 use SnowIO\AkeneoFredhopper\Mapper\StandardAttributeMapper;
 use SnowIO\AkeneoFredhopper\Mapper\AttributeOptionMapper;
 use SnowIO\AkeneoFredhopper\Mapper\AttributeValueMapper;
-use SnowIO\AkeneoFredhopper\Mapper\CategoryMapper;
+use SnowIO\AkeneoFredhopper\Mapper\CategoryMapperTest;
 use SnowIO\AkeneoFredhopper\Mapper\CompositeAttributeValueMapper;
 use SnowIO\AkeneoFredhopper\Mapper\LocalizableAttributeMapper;
 use SnowIO\AkeneoFredhopper\Mapper\PriceAttributeMapper;
@@ -28,27 +27,19 @@ class Configuration
     {
         $simpleRecipe = new self;
 
-        $simpleRecipe->skuToProductIdMapper = function (SingleChannelProductData $akeneoProductData) {
-            $channel = $akeneoProductData->getChannel();
-            $sku = $akeneoProductData->getSku();
+        $simpleRecipe->skuToProductIdMapper = function (string $channel, string $sku) {
             return "{$channel}_v_{$sku}";
         };
 
-        $simpleRecipe->skuToVariantIdMapper = function (SingleChannelProductData $akeneoProductData) {
-            $channel = $akeneoProductData->getChannel();
-            $sku = $akeneoProductData->getSku();
+        $simpleRecipe->skuToVariantIdMapper = function (string $channel, string $sku) {
             return "{$channel}_{$sku}";
         };
 
-        $simpleRecipe->variantGroupCodeToProductIdMapper = function (SingleChannelProductData $akeneoProductData) {
-            $channel = $akeneoProductData->getChannel();
-            $code = $akeneoProductData->getProperties()->getVariantGroup();
+        $simpleRecipe->variantGroupCodeToProductIdMapper = function (string $channel, string $code) {
             return "{$channel}_{$code}";
         };
 
-        $simpleRecipe->productIdMapper = function (SingleChannelProductData $akeneoProductData) {
-            $channel = $akeneoProductData->getChannel();
-            $sku = $akeneoProductData->getSku();
+        $simpleRecipe->productIdMapper = function (string $channel, string $sku) {
             return "{$channel}_{$sku}";
         };
 
@@ -102,6 +93,27 @@ class Configuration
         return $result;
     }
 
+    public function withSkuToProductIdMapper(callable $fn): self
+    {
+        $result = clone $this;
+        $result->skuToProductIdMapper = $fn;
+        return $result;
+    }
+
+    public function withSkuToVariantIdMapper(callable $fn): self
+    {
+        $result = clone $this;
+        $result->skuToVariantIdMapper = $fn;
+        return $result;
+    }
+
+    public function withVariantGroupCodeToProductIdMapper(callable $fn): self
+    {
+        $result = clone $this;
+        $result->variantGroupCodeToProductIdMapper = $fn;
+        return $result;
+    }
+
     public function withLocalizableAttributeTypeIdentifier(callable $fn): self
     {
         $result = clone $this;
@@ -117,9 +129,9 @@ class Configuration
             ->withProductIdMapper($this->productIdMapper);
     }
 
-    public function getCategoryMapper(): CategoryMapper
+    public function getCategoryMapper(): CategoryMapperTest
     {
-        return CategoryMapper::create()
+        return CategoryMapperTest::create()
             ->withCategoryIdMapper($this->categoryIdMapper)
             ->withNameMapper($this->localizedStringSetMapper);
     }

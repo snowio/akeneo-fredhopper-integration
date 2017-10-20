@@ -2,5 +2,8 @@
     "require": {
         "snowio/akeneo-data-model": "dev-master",
         "snowio/fredhopper-data-model": "dev-master"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^6.4"
     }
 }

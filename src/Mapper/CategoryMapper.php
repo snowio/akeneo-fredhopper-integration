@@ -40,6 +40,7 @@ class CategoryMapper
     /** @var callable */
     private $categoryIdMapper;
 
+    /** @var callable */
     private $nameMapper;
 
     private function __construct()

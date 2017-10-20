@@ -18,7 +18,7 @@ class AttributeOptionMapper
     {
         $attributeId = ($this->attributeIdMapper)($attributeOption->getAttributeCode());
         $valueId = $attributeOption->getOptionCode();
-        $labels = $attributeOption->getLabels();
+        $labels = ($this->displayValueMapper)($attributeOption->getLabels());
         return FredhopperAttributeOption::of($attributeId, $valueId)->withDisplayValues($labels);
     }
 

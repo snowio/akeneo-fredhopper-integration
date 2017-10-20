@@ -9,19 +9,13 @@ class ProductToVariantMapper
     public static function create(): self
     {
         $variantMapper = new self;
-        $variantMapper->skuToProductIdMapper = function (SingleChannelProductData $akeneoProductData) {
-            $channel = $akeneoProductData->getChannel();
-            $sku = $akeneoProductData->getSku();
+        $variantMapper->skuToProductIdMapper = function (string $channel, string $sku) {
             return "{$channel}_v_{$sku}";
         };
-        $variantMapper->variantGroupCodeToProductIdMapper = function (SingleChannelProductData $akeneoProductData) {
-            $channel = $akeneoProductData->getChannel();
-            $code = $akeneoProductData->getProperties()->getVariantGroup();
+        $variantMapper->variantGroupCodeToProductIdMapper = function (string $channel, string $code) {
             return "{$channel}_{$code}";
         };
-        $variantMapper->variantIdMapper = function (SingleChannelProductData $akeneoProductData) {
-            $channel = $akeneoProductData->getChannel();
-            $sku = $akeneoProductData->getSku();
+        $variantMapper->variantIdMapper = function (string $channel, string $sku) {
             return "{$channel}_{$sku}";
         };
         $variantMapper->attributeValueMapper = SimpleAttributeValueMapper::create();
@@ -30,12 +24,14 @@ class ProductToVariantMapper
 
     public function map(SingleChannelProductData $akeneoProductData): ?FredhopperVariant
     {
-        $variantId = ($this->variantIdMapper)($akeneoProductData);
+        $channel = $akeneoProductData->getChannel();
+        $sku = $akeneoProductData->getSku();
+        $variantId = ($this->variantIdMapper)($channel, $sku);
         $variantGroupCode = $akeneoProductData->getProperties()->getVariantGroup();
         if ($variantGroupCode === null) {
-            $productId = ($this->skuToProductIdMapper)($akeneoProductData);
+            $productId = ($this->skuToProductIdMapper)($channel, $sku);
         } else {
-            $productId = ($this->variantGroupCodeToProductIdMapper)($akeneoProductData);
+            $productId = ($this->variantGroupCodeToProductIdMapper)($channel, $variantGroupCode);
         }
         $akeneoAttributeValues = $akeneoProductData->getAttributeValues();
         $fredhopperAttributeValues = $this->attributeValueMapper->map($akeneoAttributeValues);
