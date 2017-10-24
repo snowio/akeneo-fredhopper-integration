@@ -24,14 +24,7 @@ class SimpleAttributeValueMapperTest extends TestCase
     public function testMap(AkeneoAttributeValueSet $akeneoAttributeValues, FredhopperAttributeValueSet $expected)
     {
         $actual = $this->simpleAttributeValueMapper->map($akeneoAttributeValues);
-        self::assertEquals($this->getJson($actual), $this->getJson($expected));
-    }
-
-    private function getJson(FredhopperAttributeValueSet $attributeValueSet)
-    {
-        return array_map(function (FredhopperAttributeValue $attributeValue) {
-            return $attributeValue->toJson();
-        }, iterator_to_array($attributeValueSet));
+        self::assertTrue($actual->equals($expected));
     }
 
     public function mapDataProvider()

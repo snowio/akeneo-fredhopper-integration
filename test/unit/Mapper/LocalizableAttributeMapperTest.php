@@ -5,8 +5,8 @@ use PHPUnit\Framework\TestCase;
 use SnowIO\AkeneoDataModel\Attribute as AkeneoAttribute;
 use SnowIO\AkeneoDataModel\AttributeType as AkeneoAttributeType;
 use SnowIO\FredhopperDataModel\AttributeType as FredhopperAttributeType;
-use SnowIO\FredhopperDataModel\Attribute as FredhopperAttribute;
-
+use SnowIO\FredhopperDataModel\AttributeData as FredhopperAttribute;
+use SnowIO\FredhopperDataModel\InternationalizedString;
 
 class LocalizableAttributeMapperTest extends TestCase
 {
@@ -37,8 +37,6 @@ class LocalizableAttributeMapperTest extends TestCase
     {
         LocalizableAttributeMapper::of([]);
     }
-
-
 
     public function getJson(array $fredhopperAttributes)
     {
@@ -72,17 +70,17 @@ class LocalizableAttributeMapperTest extends TestCase
                     FredhopperAttribute::of(
                         'size_en_gb',
                         FredhopperAttributeType::LIST,
-                        [
-                            'en_GB' => 'Size',
-                            'fr_FR' => 'Taille', //todo question should we remove the locale label that is not needed?
-                        ]),
+                        InternationalizedString::create()
+                            ->withValue('Size', 'en_GB')
+                            ->withValue('Taille', 'fr_FR')
+                    ),
                     FredhopperAttribute::of(
                         'size_fr_fr',
                         FredhopperAttributeType::LIST,
-                        [
-                            'en_GB' => 'Size',
-                            'fr_FR' => 'Taille',
-                        ]),
+                        InternationalizedString::create()
+                            ->withValue('Size', 'en_GB')
+                            ->withValue('Taille', 'fr_FR')
+                    ),
                 ],
                 function (string $type) {
                     return FredhopperAttributeType::LIST;
@@ -107,17 +105,17 @@ class LocalizableAttributeMapperTest extends TestCase
                     FredhopperAttribute::of(
                         'size_en_gb',
                         FredhopperAttributeType::LIST,
-                        [
-                            'en_GB' => 'Size',
-                            'fr_FR' => 'Taille',
-                        ]),
+                        InternationalizedString::create()
+                            ->withValue('Size', 'en_GB')
+                            ->withValue('Taille', 'fr_FR')
+                    ),
                     FredhopperAttribute::of(
                         'size_fr_fr',
                         FredhopperAttributeType::LIST,
-                        [
-                            'en_GB' => 'Size',
-                            'fr_FR' => 'Taille',
-                        ]),
+                        InternationalizedString::create()
+                            ->withValue('Size', 'en_GB')
+                            ->withValue('Taille', 'fr_FR')
+                    ),
                 ],
                 function (string $type) {
                     return FredhopperAttributeType::LIST;

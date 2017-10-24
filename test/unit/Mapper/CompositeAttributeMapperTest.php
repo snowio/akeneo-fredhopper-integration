@@ -5,7 +5,8 @@ use PHPUnit\Framework\TestCase;
 use SnowIO\AkeneoDataModel\Attribute as AkeneoAttribute;
 use SnowIO\AkeneoDataModel\AttributeType as AkeneoAttributeType;
 use SnowIO\FredhopperDataModel\AttributeType as FredhopperAttributeType;
-use SnowIO\FredhopperDataModel\Attribute as FredhopperAttribute;
+use SnowIO\FredhopperDataModel\AttributeData as FredhopperAttribute;
+use SnowIO\FredhopperDataModel\InternationalizedString;
 
 class CompositeAttributeMapperTest extends TestCase
 {
@@ -35,7 +36,7 @@ class CompositeAttributeMapperTest extends TestCase
     public function mapDataProvider()
     {
         return  [
-            'test-mulitple-mappers-on-attribute' => [
+            'test-multiple-mappers-on-attribute' => [
                 AkeneoAttribute::fromJson([
                     'code' => 'size',
                     'type' => AkeneoAttributeType::IDENTIFIER,
@@ -50,18 +51,27 @@ class CompositeAttributeMapperTest extends TestCase
                     '@timestamp' => 1508491122,
                 ]),
                 [
-                    FredhopperAttribute::of('size_mapper_modified_1', FredhopperAttributeType::TEXT, [
-                        'en_GB' => 'Size',
-                        'de_DE' => 'Größe',
-                    ]),
-                    FredhopperAttribute::of('size_mapper_modified_2', FredhopperAttributeType::TEXT, [
-                        'en_GB' => 'Size',
-                        'de_DE' => 'Größe',
-                    ]),
-                    FredhopperAttribute::of('size_mapper_modified_3', FredhopperAttributeType::TEXT, [
-                        'en_GB' => 'Size',
-                        'de_DE' => 'Größe',
-                    ]),
+                    FredhopperAttribute::of(
+                        'size_mapper_modified_1',
+                        FredhopperAttributeType::TEXT,
+                        InternationalizedString::create()
+                            ->withValue('Size', 'en_GB')
+                            ->withValue('Größe', 'de_DE')
+                    ),
+                    FredhopperAttribute::of(
+                        'size_mapper_modified_2',
+                        FredhopperAttributeType::TEXT,
+                        InternationalizedString::create()
+                            ->withValue('Size', 'en_GB')
+                            ->withValue('Größe', 'de_DE')
+                    ),
+                    FredhopperAttribute::of(
+                        'size_mapper_modified_3',
+                        FredhopperAttributeType::TEXT,
+                        InternationalizedString::create()
+                            ->withValue('Size', 'en_GB')
+                            ->withValue('Größe', 'de_DE')
+                    ),
                 ],
                 [
                     StandardAttributeMapper::create()

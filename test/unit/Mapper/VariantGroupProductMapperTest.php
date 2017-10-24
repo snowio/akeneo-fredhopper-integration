@@ -5,9 +5,8 @@ use PHPUnit\Framework\TestCase;
 use SnowIO\AkeneoDataModel\SingleChannelProductData;
 use SnowIO\AkeneoDataModel\SingleChannelVariantGroupData;
 use SnowIO\AkeneoFredhopper\VariantGroup;
-use SnowIO\FredhopperDataModel\AttributeValueSet;
 use SnowIO\FredhopperDataModel\AttributeValue as FredhopperAttributeValue;
-use SnowIO\FredhopperDataModel\Product as FredhopperProduct;
+use SnowIO\FredhopperDataModel\ProductData as FredhopperProduct;
 
 class VariantGroupProductMapperTest extends TestCase
 {
@@ -45,7 +44,7 @@ class VariantGroupProductMapperTest extends TestCase
         }
 
         $actual = $this->variantGroupToProductMapper->map($akeneoVariantGroup);
-        self::assertEquals($expected->toJson(), $actual->toJson());
+        self::assertTrue($actual->equals($expected));
     }
 
     public function mapDataProvider()
@@ -75,11 +74,10 @@ class VariantGroupProductMapperTest extends TestCase
                     'enabled' => true,
                     '@timestamp' => 1508491122,
                 ])),
-                FredhopperProduct::of('1001425_modified', [
-                    't_shirts_modified', 'summer_wear_modified'
-                ])->withAttributeValues(AttributeValueSet::of([
-                    FredhopperAttributeValue::of('color', 'blue'),
-                ])),
+                FredhopperProduct::of('1001425_modified')
+                    ->withCategoryId('t_shirts_modified')
+                    ->withCategoryId('summer_wear_modified')
+                    ->withAttributeValue(FredhopperAttributeValue::of('color', 'blue')),
                 function (string $categoryId) {
                     return $categoryId . '_modified';
                 },
@@ -112,11 +110,10 @@ class VariantGroupProductMapperTest extends TestCase
                     'enabled' => true,
                     '@timestamp' => 1508491122,
                 ])),
-                FredhopperProduct::of('1001425', [
-                    't_shirts', 'summer_wear'
-                ])->withAttributeValues(AttributeValueSet::of([
-                    FredhopperAttributeValue::of('color', 'blue'),
-                ])),
+                FredhopperProduct::of('1001425')
+                    ->withCategoryId('t_shirts')
+                    ->withCategoryId('summer_wear')
+                    ->withAttributeValue(FredhopperAttributeValue::of('color', 'blue')),
             ]
         ];
     }

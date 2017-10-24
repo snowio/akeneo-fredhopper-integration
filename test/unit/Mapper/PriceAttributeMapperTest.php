@@ -4,8 +4,9 @@ namespace SnowIO\AkeneoFredhopper\Mapper;
 use PHPUnit\Framework\TestCase;
 use SnowIO\AkeneoDataModel\Attribute as AkeneoAttribute;
 use SnowIO\AkeneoDataModel\AttributeType as AkeneoAttributeType;
-use SnowIO\FredhopperDataModel\Attribute as FredhopperAttribute;
+use SnowIO\FredhopperDataModel\AttributeData as FredhopperAttribute;
 use SnowIO\FredhopperDataModel\AttributeType as FredhopperAttributeType;
+use SnowIO\FredhopperDataModel\InternationalizedString;
 
 class PriceAttributeMapperTest extends TestCase
 {
@@ -58,15 +59,13 @@ class PriceAttributeMapperTest extends TestCase
                 [
                     FredhopperAttribute::of(
                         'price_gbp',
-                        FredhopperAttributeType::FLOAT, [
-                            'en_GB' => 'Price',
-                        ]
+                        FredhopperAttributeType::FLOAT,
+                        InternationalizedString::create()->withValue('Price', 'en_GB')
                     ),
                     FredhopperAttribute::of(
                         'price_eur',
-                        FredhopperAttributeType::FLOAT, [
-                            'en_GB' => 'Price',
-                        ]
+                        FredhopperAttributeType::FLOAT,
+                        InternationalizedString::create()->withValue('Price', 'en_GB')
                     ),
                 ],
             ],
@@ -115,10 +114,10 @@ class PriceAttributeMapperTest extends TestCase
                 [
                     FredhopperAttribute::of(
                         'size',
-                        FredhopperAttributeType::LIST, [
-                            'en_GB' => 'Size',
-                            'fr_FR' => 'Taille',
-                        ]
+                        FredhopperAttributeType::LIST,
+                        InternationalizedString::create()
+                            ->withValue('Size', 'en_GB')
+                            ->withValue('Taille', 'fr_FR')
                     ),
                 ],
             ],

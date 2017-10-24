@@ -2,7 +2,8 @@
 namespace SnowIO\AkeneoFredhopper\Mapper;
 
 use SnowIO\AkeneoDataModel\Attribute as AkeneoAttribute;
-use SnowIO\FredhopperDataModel\Attribute as FredhopperAttribute;
+use SnowIO\FredhopperDataModel\AttributeData as FredhopperAttributeData;
+use SnowIO\FredhopperDataModel\InternationalizedString;
 
 class LocalizableAttributeMapper implements AttributeMapper
 {
@@ -10,6 +11,13 @@ class LocalizableAttributeMapper implements AttributeMapper
     {
         $mapper = new self;
         $mapper->typeMapper = StandardAttributeMapper::getDefaultTypeMapper();
+        $mapper->nameMapper = function (array $names) {
+            $result = InternationalizedString::create();
+            foreach ($names as $locale => $name) {
+                $result = $result->withValue($name, $locale);
+            }
+            return $result;
+        };
         return $mapper;
     }
 
@@ -26,7 +34,7 @@ class LocalizableAttributeMapper implements AttributeMapper
 
     /**
      * @param AkeneoAttribute $akeneoAttribute
-     * @return FredhopperAttribute[]
+     * @return FredhopperAttributeData[]
      */
     public function map(AkeneoAttribute $akeneoAttribute): array
     {
@@ -35,7 +43,8 @@ class LocalizableAttributeMapper implements AttributeMapper
         $locales = $this->locales ?? \array_keys($akeneoAttribute->getLabels());
         foreach ($locales as $locale) {
             $attributeId = "{$akeneoAttribute->getCode()}_" . \strtolower($locale);
-            $attributes[] = FredhopperAttribute::of($attributeId, $type, $akeneoAttribute->getLabels());
+            $names = ($this->nameMapper)($akeneoAttribute->getLabels());
+            $attributes[] = FredhopperAttributeData::of($attributeId, $type, $names);
         }
         return $attributes;
     }
@@ -48,6 +57,7 @@ class LocalizableAttributeMapper implements AttributeMapper
     }
 
     private $locales;
+    private $nameMapper;
     private $typeMapper;
 
     private function __construct()

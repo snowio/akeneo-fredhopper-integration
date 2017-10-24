@@ -3,7 +3,8 @@ namespace SnowIO\AkeneoFredhopper\Mapper;
 
 use PHPUnit\Framework\TestCase;
 use SnowIO\AkeneoDataModel\Category as AkeneoCategory;
-use SnowIO\FredhopperDataModel\Category as FredhopperCategory;
+use SnowIO\FredhopperDataModel\CategoryData as FredhopperCategory;
+use SnowIO\FredhopperDataModel\InternationalizedString;
 
 class CategoryMapperTest extends TestCase
 {
@@ -34,7 +35,7 @@ class CategoryMapperTest extends TestCase
         }
 
         $actual = $this->categoryMapper->map($input);
-        self::assertEquals($expected->toJson(), $actual->toJson());
+        self::assertTrue($actual->equals($expected));
     }
 
     public function mapDataProvider()
@@ -51,11 +52,12 @@ class CategoryMapperTest extends TestCase
                     ],
                     '@timestamp' => 1508491122,
                 ]),
-                FredhopperCategory::of('t_shirts', [
-                    'en_GB' => 'T-Shirts',
-                    'fr_FR' => 'Tee-Shirt',
-                ])->withParent('clothes')
-                ->withTimestamp(1508491122),
+                FredhopperCategory::of(
+                    't_shirts',
+                    InternationalizedString::create()
+                        ->withValue('T-Shirts', 'en_GB')
+                        ->withValue('Tee-Shirt', 'fr_FR')
+                )->withParent('clothes'),
                 null,
                 null,
             ],
@@ -70,10 +72,12 @@ class CategoryMapperTest extends TestCase
                     ],
                     '@timestamp' => 1508491122,
                 ]),
-                FredhopperCategory::of('t_shirts', [
-                    'en_GB' => 'T-Shirts',
-                    'fr_FR' => 'Tee-Shirt',
-                ])->withTimestamp(1508491122),
+                FredhopperCategory::of(
+                    't_shirts',
+                    InternationalizedString::create()
+                        ->withValue('T-Shirts', 'en_GB')
+                        ->withValue('Tee-Shirt', 'fr_FR')
+                ),
                 null,
                 null,
             ],
@@ -88,11 +92,12 @@ class CategoryMapperTest extends TestCase
                     ],
                     '@timestamp' => 1508491122,
                 ]),
-                FredhopperCategory::of('t_shirts', [
-                    'en_GB' => 'T-Shirts',
-                    'fr_FR' => 'Tee-Shirt',
-                ])->withParent('clothes')
-                    ->withTimestamp(1508491122),
+                FredhopperCategory::of(
+                    't_shirts',
+                    InternationalizedString::create()
+                        ->withValue('T-Shirts', 'en_GB')
+                        ->withValue('Tee-Shirt', 'fr_FR')
+                )->withParent('clothes'),
                 $categoryIdMapper = function (string $categoryCode) {
                     return $categoryCode;
                 },
@@ -109,17 +114,17 @@ class CategoryMapperTest extends TestCase
                     ],
                     '@timestamp' => 1508491122,
                 ]),
-                FredhopperCategory::of('t_shirts', [
-                    'en_GB' => 'T-Shirts',
-                    'fr_FR' => 'Tee-Shirt',
-                ])->withParent('clothes')
-                    ->withTimestamp(1508491122),
+                FredhopperCategory::of(
+                    't_shirts',
+                    InternationalizedString::create()
+                        ->withValue('T-Shirts', 'en_GB')
+                        ->withValue('Tee-Shirt', 'fr_FR')
+                )->withParent('clothes'),
                 null,
                 $nameMapper = function (array $names) {
-                    return [
-                        'en_GB' => $names['en_GB'],
-                        'fr_FR' => $names['en_FR'],
-                    ];
+                    return InternationalizedString::create()
+                        ->withValue($names['en_GB'], 'en_GB')
+                        ->withValue($names['en_FR'], 'fr_FR');
                 },
             ],
         ];

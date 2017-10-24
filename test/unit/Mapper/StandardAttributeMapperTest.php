@@ -4,8 +4,9 @@ namespace SnowIO\AkeneoFredhopper\Mapper;
 use PHPUnit\Framework\TestCase;
 use SnowIO\AkeneoDataModel\Attribute as AkeneoAttribute;
 use SnowIO\AkeneoDataModel\AttributeType as AkeneoAttributeType;
-use SnowIO\FredhopperDataModel\Attribute as FredhopperAttribute;
+use SnowIO\FredhopperDataModel\AttributeData as FredhopperAttribute;
 use SnowIO\FredhopperDataModel\AttributeType as FredhopperAttributeType;
+use SnowIO\FredhopperDataModel\InternationalizedString;
 
 class StandardAttributeMapperTest extends TestCase
 {
@@ -74,11 +75,10 @@ class StandardAttributeMapperTest extends TestCase
                 [
                     FredhopperAttribute::of(
                         'size',
-                        'asset',
-                        [
-                            'en_GB' => 'Size',
-                            'fr_FR' => 'Taille',
-                        ]
+                        FredhopperAttributeType::ASSET,
+                        InternationalizedString::create()
+                            ->withValue('Size', 'en_GB')
+                            ->withValue('Taille', 'fr_FR')
                     ),
                 ],
                 null,
@@ -102,10 +102,10 @@ class StandardAttributeMapperTest extends TestCase
                 [
                     FredhopperAttribute::of(
                         'size',
-                        FredhopperAttributeType::LIST, [
-                            'en_GB' => 'Size',
-                            'fr_FR' => 'Taille',
-                        ]
+                        FredhopperAttributeType::LIST,
+                        InternationalizedString::create()
+                            ->withValue('Size', 'en_GB')
+                            ->withValue('Taille', 'fr_FR')
                     ),
                 ],
                 null,
@@ -129,9 +129,8 @@ class StandardAttributeMapperTest extends TestCase
                 [
                     FredhopperAttribute::of(
                         'size_mapped',
-                        FredhopperAttributeType::ASSET, [
-                            'en_GB' => 'Size',
-                        ]
+                        FredhopperAttributeType::ASSET,
+                        InternationalizedString::create()->withValue('Size', 'en_GB')
                     ),
                 ],
                 function (string $attributeIdMapper) {
@@ -141,9 +140,7 @@ class StandardAttributeMapperTest extends TestCase
                     return FredhopperAttributeType::ASSET;
                 },
                 function (array $name) {
-                    return [
-                        'en_GB' => $name['en_GB'],
-                    ];
+                    return InternationalizedString::create()->withValue($name['en_GB'], 'en_GB');
                 }
             ],
         ];

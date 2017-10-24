@@ -4,8 +4,7 @@ namespace SnowIO\AkeneoFredhopper\Mapper;
 use PHPUnit\Framework\TestCase;
 use SnowIO\AkeneoDataModel\SingleChannelProductData;
 use SnowIO\FredhopperDataModel\AttributeValue;
-use SnowIO\FredhopperDataModel\AttributeValueSet;
-use SnowIO\FredhopperDataModel\Variant as FredhopperVariant;
+use SnowIO\FredhopperDataModel\VariantData as FredhopperVariant;
 
 class ProductToVariantMapperTest extends TestCase
 {
@@ -76,11 +75,7 @@ class ProductToVariantMapperTest extends TestCase
                     'enabled' => true,
                     '@timestamp' => 1508491122,
                 ]),
-                FredhopperVariant::of('v_abc123', 'abc')
-                    ->withAttributeValues(AttributeValueSet::of([
-                        AttributeValue::of('size', 'Large'),
-                    ]))
-                ,
+                FredhopperVariant::of('v_abc123', 'abc')->withAttributeValue(AttributeValue::of('size', 'Large')),
                 null,
                 null,
                 null,
@@ -102,11 +97,7 @@ class ProductToVariantMapperTest extends TestCase
                     'enabled' => true,
                     '@timestamp' => 1508491122,
                 ]),
-                FredhopperVariant::of('v_abc123', 'abc123')
-                    ->withAttributeValues(AttributeValueSet::of([
-                        AttributeValue::of('size', 'Large'),
-                    ]))
-                ,
+                FredhopperVariant::of('v_abc123', 'abc123')->withAttributeValue(AttributeValue::of('size', 'Large')),
                 null,
                 null,
                 null,
@@ -128,11 +119,7 @@ class ProductToVariantMapperTest extends TestCase
                     'enabled' => true,
                     '@timestamp' => 1508491122,
                 ]),
-                FredhopperVariant::of('abc123_mapped', 'abc123_mapped')
-                    ->withAttributeValues(AttributeValueSet::of([
-                        AttributeValue::of('size', 'Large'),
-                    ]))
-                ,
+                FredhopperVariant::of('abc123_v_mapped', 'abc123_mapped')->withAttributeValue(AttributeValue::of('size', 'Large')),
                 function (string $channel, string $variantId) {
                     return $variantId . '_mapped';
                 },
@@ -140,7 +127,7 @@ class ProductToVariantMapperTest extends TestCase
                     return $sku . '_mapped';
                 },
                 function (string $channel, string $sku) {
-                    return $sku . '_mapped';
+                    return $sku . '_v_mapped';
                 },
                 SimpleAttributeValueMapper::create(),
             ],

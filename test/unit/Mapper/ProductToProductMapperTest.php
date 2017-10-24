@@ -5,7 +5,8 @@ use PHPUnit\Framework\TestCase;
 use SnowIO\AkeneoDataModel\SingleChannelProductData;
 use SnowIO\FredhopperDataModel\AttributeValue;
 use SnowIO\FredhopperDataModel\AttributeValueSet;
-use SnowIO\FredhopperDataModel\Product as FredhopperProduct;
+use SnowIO\FredhopperDataModel\CategoryIdSet;
+use SnowIO\FredhopperDataModel\ProductData as FredhopperProduct;
 
 class ProductToProductMapperTest extends TestCase
 {
@@ -43,7 +44,7 @@ class ProductToProductMapperTest extends TestCase
         }
 
         $actual = $this->productToProductMapper->map($akeneoProductData);
-        self::assertEquals($expected->toJson(), $actual->toJson());
+        self::assertTrue($actual->equals($expected));
     }
 
     public function mapDataProvider()
@@ -65,10 +66,9 @@ class ProductToProductMapperTest extends TestCase
                     'enabled' => true,
                     '@timestamp' => 1508491122,
                 ]),
-                FredhopperProduct::of('abc123', ['t_shirts', 'trousers'])
-                    ->withAttributeValues(AttributeValueSet::of([
-                        AttributeValue::of('size', 'Large'),
-                    ])),
+                FredhopperProduct::of('abc123')
+                    ->withCategoryIds(CategoryIdSet::of(['t_shirts', 'trousers']))
+                    ->withAttributeValue(AttributeValue::of('size', 'Large')),
                 null,
                 null,
                 null,
@@ -89,10 +89,9 @@ class ProductToProductMapperTest extends TestCase
                     'enabled' => true,
                     '@timestamp' => 1508491122,
                 ]),
-                FredhopperProduct::of('abc123_mapped', ['t_shirts_mapped', 'trousers_mapped'])
-                    ->withAttributeValues(AttributeValueSet::of([
-                        AttributeValue::of('size', 'Large'),
-                    ]))
+                FredhopperProduct::of('abc123_mapped')
+                    ->withCategoryIds(CategoryIdSet::of(['t_shirts_mapped', 'trousers_mapped']))
+                    ->withAttributeValue(AttributeValue::of('size', 'Large'))
                 ,
                 function (string $categoryId) {
                     return $categoryId . '_mapped';

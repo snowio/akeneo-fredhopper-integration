@@ -22,14 +22,7 @@ class LocalizedAttributeValueMapperTest extends TestCase
     public function testMap(AkeneoAttributeValueSet $akeneoAttributeValues, FredhopperAttributeValueSet $expected)
     {
         $actual = $this->localizableAttributeValueMapper->map($akeneoAttributeValues);
-        self::assertEquals($this->toJson($expected), $this->toJson($actual));
-    }
-
-    public function toJson(FredhopperAttributeValueSet $attributeValueSet)
-    {
-        return array_map(function (FredhopperAttributeValue $attributeValue) {
-            return $attributeValue->toJson();
-        } ,iterator_to_array($attributeValueSet));
+        self::assertTrue($actual->equals($expected));
     }
 
     public function mapDataProvider()

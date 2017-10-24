@@ -22,14 +22,7 @@ class PriceAttributeValueMapperTest extends TestCase
     public function testMap(AkeneoAttributeValueSet $akeneoAttributeValues, FredhopperAttributeValueSet $expected)
     {
         $actual = $this->priceAttributeValueMapper->map($akeneoAttributeValues);
-        self::assertEquals($this->getJson($expected), $this->getJson($actual));
-    }
-
-    private function getJson(FredhopperAttributeValueSet $attributeValueSet)
-    {
-        return array_map(function (FredhopperAttributeValue $attributeValue) {
-            return $attributeValue->toJson();
-        }, iterator_to_array($attributeValueSet));
+        self::assertTrue($actual->equals($expected));
     }
 
     public function mapDataProvider()

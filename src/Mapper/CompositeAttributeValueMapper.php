@@ -13,7 +13,7 @@ class CompositeAttributeValueMapper implements AttributeValueMapper
 
     public function map(AkeneoAttributeValueSet $akeneoAttributeValues): FredhopperAttributeValueSet
     {
-        $result = FredhopperAttributeValueSet::of([]);
+        $result = FredhopperAttributeValueSet::create();
         foreach ($this->mappers as $mapper) {
             $fredhopperAttributeValues = $mapper->map($akeneoAttributeValues);
             $result = $result->add($fredhopperAttributeValues);

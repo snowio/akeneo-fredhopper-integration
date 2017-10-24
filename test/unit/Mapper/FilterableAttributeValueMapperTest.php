@@ -30,14 +30,7 @@ class FilterableAttributeValueMapperTest extends TestCase
         FredhopperAttributeValueSet $expected
     ) {
         $actual = $this->filterableAttributeValueMapper->map($akeneoAttributeValues);
-        self::assertEquals($this->getJson($expected), $this->getJson($actual));
-    }
-
-    private function getJson(FredhopperAttributeValueSet $attributeValueSet)
-    {
-        return array_map(function (FredhopperAttributeValue $attributeValue) {
-            return $attributeValue->toJson();
-        }, iterator_to_array($attributeValueSet));
+        self::assertTrue($expected->equals($actual));
     }
 
     public function mapDataProvider()

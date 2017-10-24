@@ -33,7 +33,6 @@ class PriceAttributeValueMapper implements AttributeValueMapper
                 $fredhopperPriceAttributeValues[] = FredhopperAttributeValue::of($attributeId, $price->getAmount());
             }
         }
-
         return FredhopperAttributeValueSet::of($fredhopperPriceAttributeValues);
     }
 }

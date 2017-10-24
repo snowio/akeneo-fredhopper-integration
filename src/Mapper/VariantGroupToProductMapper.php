@@ -2,7 +2,8 @@
 namespace SnowIO\AkeneoFredhopper\Mapper;
 
 use SnowIO\AkeneoFredhopper\VariantGroup;
-use SnowIO\FredhopperDataModel\Product as FredhopperProduct;
+use SnowIO\FredhopperDataModel\CategoryIdSet;
+use SnowIO\FredhopperDataModel\ProductData as FredhopperProductData;
 
 class VariantGroupToProductMapper
 {
@@ -17,7 +18,7 @@ class VariantGroupToProductMapper
         return $productMapper;
     }
 
-    public function map(VariantGroup $variantGroup): FredhopperProduct
+    public function map(VariantGroup $variantGroup): FredhopperProductData
     {
         $productId = ($this->productIdMapper)($variantGroup->getCode());
         $categoryCodes = $variantGroup->getCategories()->getCategoryCodes();
@@ -26,7 +27,8 @@ class VariantGroupToProductMapper
         }, $categoryCodes);
         $akeneoAttributeValues = $variantGroup->getVariantGroupData()->getAttributeValues();
         $fredhopperAttributeValues = $this->attributeValueMapper->map($akeneoAttributeValues);
-        return FredhopperProduct::of($productId, $categoryIds)
+        return FredhopperProductData::of($productId)
+            ->withCategoryIds(CategoryIdSet::of($categoryIds))
             ->withAttributeValues($fredhopperAttributeValues);
     }
 

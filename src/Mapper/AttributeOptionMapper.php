@@ -3,6 +3,7 @@ namespace SnowIO\AkeneoFredhopper\Mapper;
 
 use SnowIO\AkeneoDataModel\AttributeOption as AkeneoAttributeOption;
 use SnowIO\FredhopperDataModel\AttributeOption as FredhopperAttributeOption;
+use SnowIO\FredhopperDataModel\InternationalizedString;
 
 class AttributeOptionMapper
 {
@@ -10,7 +11,13 @@ class AttributeOptionMapper
     {
         $attributeOptionMapper = new self;
         $attributeOptionMapper->attributeIdMapper = function (string $code) { return $code; };
-        $attributeOptionMapper->displayValueMapper = function (array $displayValues) { return $displayValues; };
+        $attributeOptionMapper->displayValueMapper = function (array $optionLabels) {
+            $result = InternationalizedString::create();
+            foreach ($optionLabels as $locale => $displayValue) {
+                $result = $result->withValue($displayValue, $locale);
+            }
+            return $result;
+        };
         return $attributeOptionMapper;
     }
 
