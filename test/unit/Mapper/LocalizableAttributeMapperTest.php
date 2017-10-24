@@ -11,8 +11,6 @@ use SnowIO\FredhopperDataModel\Attribute as FredhopperAttribute;
 class LocalizableAttributeMapperTest extends TestCase
 {
 
-    private $localizableAttributeMapper;
-
     /**
      * @dataProvider mapDataProvider
      */
