@@ -16,11 +16,18 @@ class LocalizableAttributeMapperTest extends TestCase
     /**
      * @dataProvider mapDataProvider
      */
-    public function testMap(AkeneoAttribute $akeneoAttribute, array $locales, array $expected)
+    public function testMap(LocalizableAttributeMapper $mapper, AkeneoAttribute $akeneoAttribute, array $expected)
     {
-        $this->localizableAttributeMapper = LocalizableAttributeMapper::of($locales);
-        $actual = $this->localizableAttributeMapper->map($akeneoAttribute);
+        $actual = $mapper->map($akeneoAttribute);
         self::assertEquals($this->getJson($expected), $this->getJson($actual));
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testInvalidCreationOfMapper()
+    {
+        LocalizableAttributeMapper::of([]);
     }
 
     public function getJson(array $fredhopperAttributes)
@@ -34,6 +41,10 @@ class LocalizableAttributeMapperTest extends TestCase
     {
         return [
             'testWithLocales' => [
+                LocalizableAttributeMapper::of([
+                    'en_GB',
+                    'fr_FR'
+                ]),
                 AkeneoAttribute::fromJson([
                     'code' => 'size',
                     'type' => AkeneoAttributeType::SIMPLESELECT,
@@ -48,27 +59,24 @@ class LocalizableAttributeMapperTest extends TestCase
                     '@timestamp' => 1508491122,
                 ]),
                 [
-                    'en_GB',
-                    'fr_FR'
-                ],
-                [
                     FredhopperAttribute::of(
-                        'size_en_GB',
-                        FredhopperAttributeType::TEXT,
+                        'size_en_gb',
+                        FredhopperAttributeType::LIST,
                         [
                             'en_GB' => 'Size',
-                            'de_DE' => 'Größe',
+                            'fr_FR' => 'Taille', //todo question should we remove the locale label that is not needed?
                         ]),
                     FredhopperAttribute::of(
-                        'size_fr_FR',
-                        FredhopperAttributeType::TEXT,
+                        'size_fr_fr',
+                        FredhopperAttributeType::LIST,
                         [
                             'en_GB' => 'Size',
-                            'de_DE' => 'Größe',
+                            'fr_FR' => 'Taille',
                         ]),
                 ]
             ],
-            'testNoLocales' => [
+            'testAutomaticLocales' => [
+                LocalizableAttributeMapper::create(),
                 AkeneoAttribute::fromJson([
                     'code' => 'size',
                     'type' => AkeneoAttributeType::SIMPLESELECT,
@@ -82,12 +90,23 @@ class LocalizableAttributeMapperTest extends TestCase
                     'group' => 'general',
                     '@timestamp' => 1508491122,
                 ]),
-                [],
                 [
-                    //todo discussion are we really suppose to get nothing
+                    FredhopperAttribute::of(
+                        'size_en_gb',
+                        FredhopperAttributeType::LIST,
+                        [
+                            'en_GB' => 'Size',
+                            'fr_FR' => 'Taille',
+                        ]),
+                    FredhopperAttribute::of(
+                        'size_fr_fr',
+                        FredhopperAttributeType::LIST,
+                        [
+                            'en_GB' => 'Size',
+                            'fr_FR' => 'Taille',
+                        ]),
                 ]
             ]
-            //todo more testcases regarding locales
         ];
     }
 

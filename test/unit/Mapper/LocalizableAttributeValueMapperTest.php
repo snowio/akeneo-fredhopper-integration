@@ -35,26 +35,28 @@ class LocalizedAttributeValueMapperTest extends TestCase
     public function mapDataProvider()
     {
         return [
-            [
+            'testWithVariousAttributes' => [
                 AkeneoAttributeValueSet::fromJson('main', [
                     'attribute_values' => [
                         'size' => 'large',
                         'price' => [
-                            'gbp' => 30,
-                            'eur' => 37.45,
+                            'gbp' => '30',
+                            'eur' => '37.45',
                         ],
-                        'weight' =>  30
+                        'weight' =>  '30'
                     ],
+                    'localizations' => [
+                        'en_GB' => [
+                            'attribute_values' => [
+                                'size' => 'Large'
+                            ]
+                        ]
+                    ]
                 ]),
                 FredhopperAttributeValueSet::of([
-                    FredhopperAttributeValue::of('size', 'large'),
-                    FredhopperAttributeValue::of('price', [
-                        'gbp' => 30.98,
-                        'eur' => 37.45,
-                    ]),
-                    FredhopperAttributeValue::of('weight', 30)
+                    FredhopperAttributeValue::of('size_en_gb', 'Large'), //todo is this really the desired functionality
                 ]),
-            ]
+            ],
         ];
     }
 }

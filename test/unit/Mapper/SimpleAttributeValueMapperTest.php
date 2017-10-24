@@ -37,42 +37,22 @@ class SimpleAttributeValueMapperTest extends TestCase
     public function mapDataProvider()
     {
         return [
-            [
+            'testWithMulitpleDifferentAttributeValues' => [
                 AkeneoAttributeValueSet::fromJson('main', [
                     'attribute_values' => [
                         'size' => 'large',
                         'price' => [
-                            'gbp' => 30,
-                            'eur' => 37.45,
+                            'gbp' => '30',
+                            'eur' => '37.45',
                         ],
-                        'weight' => 30
+                        'weight' => '30',
                     ],
                 ]),
                 FredhopperAttributeValueSet::of([
                     FredhopperAttributeValue::of('size', 'large'),
+                    FredhopperAttributeValue::of('weight', '30'),
                 ]),
-            ],
-            [
-                AkeneoAttributeValueSet::fromJson('main', [
-                    'attribute_values' => [
-                        'size' => 'large',
-                        'price' => [
-                            'gbp' => 30,
-                            'eur' => 37.45,
-                        ],
-                        'weight' => 30
-                    ],
-                ]),
-                FredhopperAttributeValueSet::of([
-                    FredhopperAttributeValue::of('size', 'large'),
-                    FredhopperAttributeValue::of('price', [
-                        'gbp' => 30,
-                        'eur' => 37.45,
-                    ]),
-                    FredhopperAttributeValue::of('weight', 30),
-                ]),
-            ],
-
+            ]
         ];
     }
 

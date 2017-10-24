@@ -8,7 +8,7 @@ use SnowIO\FredhopperDataModel\AttributeValueSet as FredhopperAttributeValueSet;
 
 class LocalizedAttributeValueMapper implements AttributeValueMapper
 {
-    public static function create(): self
+    public static function create()
     {
         return FilterableAttributeValueMapper::of(
             new self,

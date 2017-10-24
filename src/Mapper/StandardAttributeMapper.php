@@ -26,7 +26,7 @@ class StandardAttributeMapper implements AttributeMapper
         $attributeId = ($this->attributeIdMapper)($akeneoAttribute->getCode());
         $labels = ($this->nameMapper)($akeneoAttribute->getLabels());
         if ($akeneoAttribute->isLocalizable()) {
-            return [FredhopperAttribute::of($attributeId, 'asset', $labels)];
+            return [FredhopperAttribute::of($attributeId, FredhopperAttributeType::ASSET, $labels)];
         }
         $fredhopperType = ($this->typeMapper)($akeneoAttribute->getType());
         return [FredhopperAttribute::of($attributeId, $fredhopperType, $labels)];

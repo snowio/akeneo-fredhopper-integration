@@ -30,7 +30,7 @@ class StandardAttributeMapperTest extends TestCase
 
         if (null !== $attributeIdMapper) {
             $this->standardAttributeMapper = $this->standardAttributeMapper
-                ->withTypeMapper($attributeIdMapper);
+                ->withAttributeIdMapper($attributeIdMapper);
         }
 
         if (null !== $typeMapper) {
@@ -129,7 +129,7 @@ class StandardAttributeMapperTest extends TestCase
                 [
                     FredhopperAttribute::of(
                         'size_mapped',
-                        'decimal', [
+                        FredhopperAttributeType::ASSET, [
                             'en_GB' => 'Size',
                         ]
                     ),
@@ -138,7 +138,7 @@ class StandardAttributeMapperTest extends TestCase
                     return $attributeIdMapper . '_mapped';
                 },
                 function (string $typeMapper) {
-                    return 'decimal';
+                    return FredhopperAttributeType::ASSET;
                 },
                 function (array $name) {
                     return [

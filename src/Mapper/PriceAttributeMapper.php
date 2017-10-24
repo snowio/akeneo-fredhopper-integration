@@ -3,7 +3,8 @@ namespace SnowIO\AkeneoFredhopper\Mapper;
 
 use SnowIO\AkeneoDataModel\Attribute as AkeneoAttribute;
 use SnowIO\FredhopperDataModel\Attribute as FredhopperAttribute;
-use SnowIO\FredhopperDataModel\AttributeType;
+use SnowIO\AkeneoDataModel\AttributeType as AkeneoAttributeType;
+use SnowIO\FredhopperDataModel\AttributeType as FredhopperAttributeType;
 
 class PriceAttributeMapper implements AttributeMapper
 {
@@ -21,14 +22,14 @@ class PriceAttributeMapper implements AttributeMapper
      */
     public function map(AkeneoAttribute $akeneoAttribute): array
     {
-        if ($akeneoAttribute->getType() !== 'pim_catalog_price_collection') {
+        if ($akeneoAttribute->getType() !== AkeneoAttributeType::PRICE_COLLECTION) {
             throw new \Error;
         }
 
         $attributes = [];
         foreach ($this->currencies as $currency) {
             $attributeId = "{$akeneoAttribute->getCode()}_" . \strtolower($currency);
-            $attributes[] = FredhopperAttribute::of($attributeId, AttributeType::FLOAT, $akeneoAttribute->getLabels());
+            $attributes[] = FredhopperAttribute::of($attributeId, FredhopperAttributeType::FLOAT, $akeneoAttribute->getLabels());
         }
         return $attributes;
     }

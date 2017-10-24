@@ -59,6 +59,7 @@ class VariantGroupProductMapperTest extends TestCase
                     'attribute_values' => [
                         'color' => 'blue'
                     ],
+                    '@timestamp' => 1508491122,
                 ]))->withProductData(SingleChannelProductData::fromJson([
                     'sku' => 'abc123',
                     'channel' => 'main',
@@ -72,6 +73,7 @@ class VariantGroupProductMapperTest extends TestCase
                     ],
                     'localizations' => [],
                     'enabled' => true,
+                    '@timestamp' => 1508491122,
                 ])),
                 FredhopperProduct::of('1001425', [
                     't_shirts', 'summer_wear'

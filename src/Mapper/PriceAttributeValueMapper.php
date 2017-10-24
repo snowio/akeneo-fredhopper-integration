@@ -10,7 +10,7 @@ use SnowIO\FredhopperDataModel\AttributeValue as FredhopperAttributeValue;
 
 class PriceAttributeValueMapper implements AttributeValueMapper
 {
-    public static function create(): self
+    public static function create()
     {
         return FilterableAttributeValueMapper::of(
             new self,

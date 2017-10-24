@@ -14,7 +14,7 @@ class FilterableAttributeValueMapperTest extends TestCase
 
     public function setUp()
     {
-        $this->filterableAttributeValueMapper = FilterableAttributeMapper::of(
+        $this->filterableAttributeValueMapper = FilterableAttributeValueMapper::of(
             SimpleAttributeValueMapper::create(),
             function (AkeneoAttributeValue $akeneoAttributeValue) {
                 return $akeneoAttributeValue->getAttributeCode() === 'size';
@@ -43,27 +43,27 @@ class FilterableAttributeValueMapperTest extends TestCase
     public function mapDataProvider()
     {
         return [
-            [
+            'filterSize' => [
                 AkeneoAttributeValueSet::fromJson('main', [
                     'attribute_values' => [
                         'size' => 'large',
                         'price' => [
-                            'gbp' => 30,
-                            'eur' => 37.45,
+                            'gbp' => '30',
+                            'eur' => '37.45',
                         ],
-                        'weight' =>  30
+                        'weight' =>  '30'
                     ],
                 ]),
                 FredhopperAttributeValueSet::of([
                     FredhopperAttributeValue::of('size', 'large'),
                 ]),
             ],
-            [
+            'filterSizeWillReturnEmptyAttributeValueSet' => [
                 AkeneoAttributeValueSet::fromJson('main', [
                     'attribute_values' => [
                         'price' => [
-                            'gbp' => 30,
-                            'eur' => 37.45,
+                            'gbp' => '30',
+                            'eur' => '37.45',
                         ],
                     ],
                 ]),

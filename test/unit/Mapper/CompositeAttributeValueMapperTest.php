@@ -44,15 +44,15 @@ class CompositeAttributeValueMapperTest extends TestCase
                     'attribute_values' => [
                         'size' => 'Large',
                         'price' => [
-                            'gbp' => 30,
-                            'eur' => 37.45,
+                            'gbp' => '30',
+                            'eur' => '37.45',
                         ],
-                        'weight' => 30,
+                        'weight' => '30',
                     ],
                 ]),
                 FredhopperAttributeValueSet::of([
                     FredhopperAttributeValue::of('size', 'Large'),
-                    FredhopperAttributeValue::of('weight', 30),
+                    FredhopperAttributeValue::of('weight', '30'),
                 ]),
                 [
                     SimpleAttributeValueMapper::create(),

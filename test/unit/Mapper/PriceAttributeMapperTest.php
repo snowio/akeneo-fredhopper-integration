@@ -19,6 +19,15 @@ class PriceAttributeMapperTest extends TestCase
         self::assertEquals($this->getJson($expected), $this->getJson($actual));
     }
 
+    /**
+     * @dataProvider invalidMapDataProvider
+     * @expectedException \Error
+     */
+    public function testMapWithNonPriceType(array $currencies, AkeneoAttribute $akeneoAttribute, array $expected)
+    {
+        $this->testMap($currencies, $akeneoAttribute, $expected);
+    }
+
     public function getJson(array $expectedFredhopperAttributes)
     {
         return array_map(function (FredhopperAttribute $attribute) {
@@ -53,8 +62,38 @@ class PriceAttributeMapperTest extends TestCase
                             'en_GB' => 'Price',
                         ]
                     ),
+                    FredhopperAttribute::of(
+                        'price_eur',
+                        FredhopperAttributeType::FLOAT, [
+                            'en_GB' => 'Price',
+                        ]
+                    ),
                 ],
             ],
+            'without-currencies' => [
+                [],
+                AkeneoAttribute::fromJson([
+                    'code' => 'price',
+                    'type' => AkeneoAttributeType::PRICE_COLLECTION,
+                    'localizable' => false,
+                    'scopable' => false,
+                    'sort_order' => 34,
+                    'labels' => [
+                        'en_GB' => 'Price',
+                    ],
+                    'group' => 'general',
+                    '@timestamp' => 1508491122,
+                ]),
+                [
+                    //todo should we return an empty array really
+                ],
+            ]
+        ];
+    }
+
+    public function invalidMapDataProvider()
+    {
+        return [
             'test-with-non-price-type' => [
                 [
                     'gbp',
@@ -83,24 +122,6 @@ class PriceAttributeMapperTest extends TestCase
                     ),
                 ],
             ],
-            'without-currencies' => [
-                [],
-                AkeneoAttribute::fromJson([
-                    'code' => 'price',
-                    'type' => AkeneoAttributeType::PRICE_COLLECTION,
-                    'localizable' => false,
-                    'scopable' => false,
-                    'sort_order' => 34,
-                    'labels' => [
-                        'en_GB' => 'Price',
-                    ],
-                    'group' => 'general',
-                    '@timestamp' => 1508491122,
-                ]),
-                [
-                    //todo should we return an empty array really
-                ],
-            ]
         ];
     }
 }

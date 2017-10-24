@@ -39,14 +39,14 @@ class PriceAttributeValueMapperTest extends TestCase
                 AkeneoAttributeValueSet::fromJson('main', [
                     'attribute_values' => [
                         'price' => [
-                            'gbp' => 30,
-                            'eur' => 37.45,
+                            'gbp' => '30',
+                            'eur' => '37.45',
                         ],
                     ],
                 ]),
                 FredhopperAttributeValueSet::of([
-                    FredhopperAttributeValue::of('price_gbp', 30),
-                    FredhopperAttributeValue::of('price_eur', 37.465),
+                    FredhopperAttributeValue::of('price_gbp', '30'),
+                    FredhopperAttributeValue::of('price_eur', '37.45'),
                 ]),
             ],
             'nonPriceAttribute' => [
