@@ -8,15 +8,14 @@ use SnowIO\FredhopperDataModel\AttributeData as FredhopperAttribute;
 use SnowIO\FredhopperDataModel\AttributeType as FredhopperAttributeType;
 use SnowIO\FredhopperDataModel\InternationalizedString;
 
-
-class FilterableAttributeMapperTest extends TestCase
+class AttributeMapperWithFilterTest extends TestCase
 {
-    /** @var  FilterableAttributeMapper */
+    /** @var  AttributeMapperWithFilter */
     private $filterableAttributeMapper;
 
     public function setUp()
     {
-        $this->filterableAttributeMapper = FilterableAttributeMapper::of(
+        $this->filterableAttributeMapper = AttributeMapperWithFilter::of(
             StandardAttributeMapper::create(),
             function (AkeneoAttribute $attribute) {
                 return $attribute->getCode() === 'size';

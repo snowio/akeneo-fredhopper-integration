@@ -12,7 +12,7 @@ class SimpleAttributeValueMapper implements AttributeValueMapper
 {
     public static function create()
     {
-        return FilterableAttributeValueMapper::of(
+        return AttributeValueMapperWithFilter::of(
             new self,
             function (AttributeValue $attributeValue) {
                 return !$attributeValue->getValue() instanceof PriceSet;

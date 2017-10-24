@@ -7,14 +7,14 @@ use SnowIO\FredhopperDataModel\AttributeValue as FredhopperAttributeValue;
 use SnowIO\AkeneoDataModel\AttributeValueSet as AkeneoAttributeValueSet;
 use SnowIO\FredhopperDataModel\AttributeValueSet as FredhopperAttributeValueSet;
 
-class FilterableAttributeValueMapperTest extends TestCase
+class AttributeValueMapperWithFilterTest extends TestCase
 {
-    /** @var FilterableAttributeValueMapper  */
+    /** @var AttributeValueMapperWithFilter  */
     private $filterableAttributeValueMapper;
 
     public function setUp()
     {
-        $this->filterableAttributeValueMapper = FilterableAttributeValueMapper::of(
+        $this->filterableAttributeValueMapper = AttributeValueMapperWithFilter::of(
             SimpleAttributeValueMapper::create(),
             function (AkeneoAttributeValue $akeneoAttributeValue) {
                 return $akeneoAttributeValue->getAttributeCode() === 'size';

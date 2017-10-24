@@ -3,9 +3,8 @@ namespace SnowIO\AkeneoFredhopper\Mapper;
 
 use SnowIO\AkeneoDataModel\Attribute as AkeneoAttribute;
 
-class FilterableAttributeMapper implements AttributeMapper
+class AttributeMapperWithFilter implements AttributeMapper
 {
-
     public static function of(AttributeMapper $mapper, callable $filter): self
     {
         $filterableAttributeMapper = new self;

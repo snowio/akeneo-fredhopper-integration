@@ -4,7 +4,7 @@ namespace SnowIO\AkeneoFredhopper\Mapper;
 use SnowIO\AkeneoDataModel\AttributeValueSet as AkeneoAttributeValueSet;
 use SnowIO\FredhopperDataModel\AttributeValueSet as FredhopperAttributeValueSet;
 
-class FilterableAttributeValueMapper implements AttributeValueMapper
+class AttributeValueMapperWithFilter implements AttributeValueMapper
 {
     public static function of(AttributeValueMapper $mapper, callable $filter): self
     {

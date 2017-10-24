@@ -10,7 +10,7 @@ class LocalizedAttributeValueMapper implements AttributeValueMapper
 {
     public static function create()
     {
-        return FilterableAttributeValueMapper::of(
+        return AttributeValueMapperWithFilter::of(
             new self,
             function (AkeneoAttributeValue $attributeValue) {
                 return $attributeValue->getScope()->getLocale() !== null;

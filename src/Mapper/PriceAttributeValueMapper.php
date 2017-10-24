@@ -12,7 +12,7 @@ class PriceAttributeValueMapper implements AttributeValueMapper
 {
     public static function create()
     {
-        return FilterableAttributeValueMapper::of(
+        return AttributeValueMapperWithFilter::of(
             new self,
             function (AkeneoAttributeValue $akeneoAttributeValue) {
                 return $akeneoAttributeValue->getValue() instanceof PriceSet;
