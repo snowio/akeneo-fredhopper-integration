@@ -12,6 +12,9 @@ class StandardAttributeMapper implements AttributeMapper
     {
         $mapper = new self;
         $mapper->typeMapper = self::getDefaultTypeMapper();
+        $mapper->attributeIdMapper = function (string $code) {
+            return $code;
+        };
         $mapper->nameMapper = function (array $labels) {
             return $labels;
         };
@@ -20,12 +23,13 @@ class StandardAttributeMapper implements AttributeMapper
 
     public function map(AkeneoAttribute $akeneoAttribute): array
     {
+        $attributeId = ($this->attributeIdMapper)($akeneoAttribute->getCode());
         $labels = ($this->nameMapper)($akeneoAttribute->getLabels());
         if ($akeneoAttribute->isLocalizable()) {
-            return [FredhopperAttribute::of($akeneoAttribute->getCode(), 'asset', $labels)];
+            return [FredhopperAttribute::of($attributeId, FredhopperAttributeType::ASSET, $labels)];
         }
         $fredhopperType = ($this->typeMapper)($akeneoAttribute->getType());
-        return [FredhopperAttribute::of($akeneoAttribute->getCode(), $fredhopperType, $labels)];
+        return [FredhopperAttribute::of($attributeId, $fredhopperType, $labels)];
     }
 
     public function withTypeMapper(callable $fn): self
@@ -39,6 +43,13 @@ class StandardAttributeMapper implements AttributeMapper
     {
         $result = clone $this;
         $result->nameMapper = $fn;
+        return $result;
+    }
+
+    public function withAttributeIdMapper(callable $fn): self
+    {
+        $result = clone $this;
+        $result->attributeIdMapper = $fn;
         return $result;
     }
 
@@ -59,6 +70,7 @@ class StandardAttributeMapper implements AttributeMapper
 
     private $typeMapper;
     private $nameMapper;
+    private $attributeIdMapper;
 
     private function __construct()
     {

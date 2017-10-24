@@ -10,10 +10,8 @@ class ProductToProductMapper
     {
         $standaloneProductMapper = new self;
         $standaloneProductMapper->categoryIdMapper = function ($categoryCode) { return $categoryCode; };
-        $standaloneProductMapper->productIdMapper = function (SingleChannelProductData $akeneoProductData) {
-            $channel = $akeneoProductData->getChannel();
-            $sku = $akeneoProductData->getSku();
-            return "{$channel}_{$sku}";
+        $standaloneProductMapper->productIdMapper = function (string $channel, string $sku) {
+            return $sku;
         };
         $standaloneProductMapper->attributeValueMapper = SimpleAttributeValueMapper::create();
         return $standaloneProductMapper;
@@ -21,7 +19,9 @@ class ProductToProductMapper
 
     public function map(SingleChannelProductData $akeneoProductData): FredhopperProduct
     {
-        $productId = ($this->productIdMapper)($akeneoProductData);
+        $channel = $akeneoProductData->getChannel();
+        $sku = $akeneoProductData->getSku();
+        $productId = ($this->productIdMapper)($channel, $sku);
         $categoryCodes = $akeneoProductData->getProperties()->getCategories()
             ->getCategoryCodes();
         $categoryIds = \array_map(function (string $categoryCode) {
@@ -47,7 +47,7 @@ class ProductToProductMapper
         return $result;
     }
 
-    public function withAttributeValueMapper(SimpleAttributeValueMapper $attributeValueMapper): self
+    public function withAttributeValueMapper($attributeValueMapper): self
     {
         $result = clone $this;
         $result->attributeValueMapper = $attributeValueMapper;

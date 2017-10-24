@@ -1,5 +1,5 @@
 <?php
-namespace SnowIO\AkeneoFredhopper\Recipe;
+namespace SnowIO\AkeneoFredhopper;
 
 use SnowIO\AkeneoDataModel\CategoryReferenceSet;
 use SnowIO\AkeneoDataModel\SingleChannelProductData;
@@ -16,12 +16,12 @@ class VariantGroup
 
     public function getCode(): string
     {
-        return $this->code;
+        return $this->variantGroupData->getCode();
     }
 
     public function getChannel(): string
     {
-        return $this->channel;
+        return $this->variantGroupData->getChannel();
     }
 
     public function withProductData(SingleChannelProductData $productData): self
@@ -48,9 +48,8 @@ class VariantGroup
             ->getCategories();
     }
 
+    /** @var  SingleChannelVariantGroupData */
     private $variantGroupData;
-    private $code;
-    private $channel;
 
     /** @var SingleChannelProductData */
     private $productData;
