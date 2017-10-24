@@ -1,5 +1,5 @@
 <?php
-namespace SnowIO\AkeneoFredhopper\Recipe;
+namespace SnowIO\AkeneoFredhopper;
 
 use SnowIO\AkeneoDataModel\CategoryReferenceSet;
 use SnowIO\AkeneoDataModel\SingleChannelProductData;

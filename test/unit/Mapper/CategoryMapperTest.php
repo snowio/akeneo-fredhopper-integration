@@ -15,11 +15,14 @@ class CategoryMapperTest extends TestCase
         $this->categoryMapper = CategoryMapper::create();
     }
 
+    /**
+     * @dataProvider mapDataProvider
+     */
     public function testMap(
         AkeneoCategory $input,
         FredhopperCategory $expected,
-        ?callable $categoryIdMapper,
-        ?callable $nameMapper
+        callable $categoryIdMapper = null,
+        callable $nameMapper = null
     ) {
 
         if ($categoryIdMapper !== null) {
@@ -30,25 +33,25 @@ class CategoryMapperTest extends TestCase
             $this->categoryMapper = $this->categoryMapper->withNameMapper($nameMapper);
         }
 
-        $fredhopperOutputCategory = $this->categoryMapper->map($input);
-        self::assertEquals($expected->toJson(), $fredhopperOutputCategory->toJson());
+        $actual = $this->categoryMapper->map($input);
+        self::assertEquals($expected->toJson(), $actual->toJson());
     }
 
-    public function testMapDataProvider()
+    public function mapDataProvider()
     {
         return [
             'hasParent' => [
                 AkeneoCategory::fromJson([
-                    'code' => 't-shirts',
+                    'code' => 't_shirts',
                     'parent' => 'clothes',
-                    'path' => ['clothes', 't-shirts'],
+                    'path' => ['clothes', 't_shirts'],
                     'labels' => [
                         'en_GB' => 'T-Shirts',
                         'fr_FR' => 'Tee-Shirt',
                     ],
                     '@timestamp' => 1508491122,
                 ]),
-                FredhopperCategory::of('t-shirts', [
+                FredhopperCategory::of('t_shirts', [
                     'en_GB' => 'T-Shirts',
                     'fr_FR' => 'Tee-Shirt',
                 ])->withParent('clothes')
@@ -58,15 +61,16 @@ class CategoryMapperTest extends TestCase
             ],
             'doesntHaveParent' => [
                 AkeneoCategory::fromJson([
-                    'code' => 't-shirts',
-                    'path' => ['clothes', 't-shirts'],
+                    'code' => 't_shirts',
+                    'path' => ['clothes', 't_shirts'],
+                    'parent' => null,
                     'labels' => [
                         'en_GB' => 'T-Shirts',
                         'fr_FR' => 'Tee-Shirt',
                     ],
                     '@timestamp' => 1508491122,
                 ]),
-                FredhopperCategory::of('t-shirts', [
+                FredhopperCategory::of('t_shirts', [
                     'en_GB' => 'T-Shirts',
                     'fr_FR' => 'Tee-Shirt',
                 ])->withTimestamp(1508491122),
@@ -75,18 +79,20 @@ class CategoryMapperTest extends TestCase
             ],
             'withCategoryIdMapper' => [
                 AkeneoCategory::fromJson([
-                    'code' => 't-shirts',
-                    'path' => ['clothes', 't-shirts'],
+                    'code' => 't_shirts',
+                    'path' => ['clothes', 't_shirts'],
+                    'parent' => 'clothes',
                     'labels' => [
                         'en_GB' => 'T-Shirts',
-                        'en_FR' => 'Tee-Shirt',
+                        'fr_FR' => 'Tee-Shirt',
                     ],
                     '@timestamp' => 1508491122,
                 ]),
-                FredhopperCategory::of('t-shirts', [
+                FredhopperCategory::of('t_shirts', [
                     'en_GB' => 'T-Shirts',
                     'fr_FR' => 'Tee-Shirt',
-                ])->withTimestamp(1508491122),
+                ])->withParent('clothes')
+                    ->withTimestamp(1508491122),
                 $categoryIdMapper = function (string $categoryCode) {
                     return $categoryCode;
                 },
@@ -94,18 +100,20 @@ class CategoryMapperTest extends TestCase
             ],
             'withNameMapper' => [
                 AkeneoCategory::fromJson([
-                    'code' => 't-shirts',
-                    'path' => ['clothes', 't-shirts'],
+                    'code' => 't_shirts',
+                    'path' => ['clothes', 't_shirts'],
+                    'parent' => 'clothes',
                     'labels' => [
                         'en_GB' => 'T-Shirts',
                         'en_FR' => 'Tee-Shirt',
                     ],
                     '@timestamp' => 1508491122,
                 ]),
-                FredhopperCategory::of('t-shirts', [
+                FredhopperCategory::of('t_shirts', [
                     'en_GB' => 'T-Shirts',
                     'fr_FR' => 'Tee-Shirt',
-                ])->withTimestamp(1508491122),
+                ])->withParent('clothes')
+                    ->withTimestamp(1508491122),
                 null,
                 $nameMapper = function (array $names) {
                     return [

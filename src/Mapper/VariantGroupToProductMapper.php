@@ -1,7 +1,7 @@
 <?php
 namespace SnowIO\AkeneoFredhopper\Mapper;
 
-use SnowIO\AkeneoFredhopper\Recipe\VariantGroup;
+use SnowIO\AkeneoFredhopper\VariantGroup;
 use SnowIO\FredhopperDataModel\Product as FredhopperProduct;
 
 class VariantGroupToProductMapper
@@ -11,9 +11,7 @@ class VariantGroupToProductMapper
         $productMapper = new self;
         $productMapper->categoryIdMapper = function ($categoryCode) { return $categoryCode; };
         $productMapper->productIdMapper = function (VariantGroup $variantGroup) {
-            $channel = $variantGroup->getChannel();
-            $code = $variantGroup->getCode();
-            return "{$channel}_{$code}";
+            return $variantGroup->getCode();
         };
         $productMapper->attributeValueMapper = SimpleAttributeValueMapper::create();
         return $productMapper;

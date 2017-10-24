@@ -17,9 +17,12 @@ class CompositeAttributeValueMapperTest extends TestCase
         $this->compositeAttributeValueMapper = CompositeAttributeValueMapper::create();
     }
 
+    /**
+     * @dataProvider mapDataProvider
+     */
     public function testMap(
         AkeneoAttributeValueSet $akeneoAttributeValues,
-        FredhopperAttributeValueSet $expectedFredhopperAttributeValues,
+        FredhopperAttributeValueSet $expected,
         array $mappers
     ) {
         foreach ($mappers as $mapper) {
@@ -27,35 +30,31 @@ class CompositeAttributeValueMapperTest extends TestCase
                 ->with($mapper);
         }
 
-        $outputFredhopperAttributeValues = $this->compositeAttributeValueMapper
+        $actual = $this->compositeAttributeValueMapper
             ->map($akeneoAttributeValues);
 
-        self::assertTrue($expectedFredhopperAttributeValues->equals($outputFredhopperAttributeValues));
+        self::assertTrue($expected->equals($actual));
     }
 
-    public function testDataProvider()
+    public function mapDataProvider()
     {
         return [
             'with-simple-attribute-value-mappers' => [
                 AkeneoAttributeValueSet::fromJson('main', [
                     'attribute_values' => [
-                        'size' => 'large',
+                        'size' => 'Large',
                         'price' => [
                             'gbp' => 30,
                             'eur' => 37.45,
                         ],
-                        'weight' =>  30
+                        'weight' => 30,
                     ],
                 ]),
                 FredhopperAttributeValueSet::of([
-                    FredhopperAttributeValue::of('size', 'large'),
-                    FredhopperAttributeValue::of('price', [
-                        'gbp' => 30.98,
-                        'eur' => 37.45,
-                    ]),
-                    FredhopperAttributeValue::of('weight', 30)
+                    FredhopperAttributeValue::of('size', 'Large'),
+                    FredhopperAttributeValue::of('weight', 30),
                 ]),
-                $mappers = [
+                [
                     SimpleAttributeValueMapper::create(),
                 ],
             ],

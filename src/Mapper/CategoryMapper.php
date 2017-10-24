@@ -17,10 +17,14 @@ class CategoryMapper
     public function map(AkeneoCategory $akeneoCategory): FredhopperCategory
     {
         $categoryId = ($this->categoryIdMapper)($akeneoCategory->getCode());
-        $parentId = ($this->categoryIdMapper)($akeneoCategory->getParent());
         $names = ($this->nameMapper)($akeneoCategory->getLabels());
-        return FredhopperCategory::of($categoryId, $names)->withParent($parentId)
-            ->withTimestamp($akeneoCategory->getTimestamp());
+        $category = FredhopperCategory::of($categoryId, $names);
+        if ($akeneoCategory->getParent() !== null) {
+            $parentId = ($this->categoryIdMapper)($akeneoCategory->getParent());
+            $category = $category->withParent($parentId);
+        }
+
+        return $category->withTimestamp($akeneoCategory->getTimestamp());
     }
 
     public function withCategoryIdMapper(callable $fn): self

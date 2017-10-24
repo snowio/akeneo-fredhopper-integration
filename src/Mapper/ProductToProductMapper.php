@@ -11,7 +11,7 @@ class ProductToProductMapper
         $standaloneProductMapper = new self;
         $standaloneProductMapper->categoryIdMapper = function ($categoryCode) { return $categoryCode; };
         $standaloneProductMapper->productIdMapper = function (string $channel, string $sku) {
-            return "{$channel}_{$sku}";
+            return $sku;
         };
         $standaloneProductMapper->attributeValueMapper = SimpleAttributeValueMapper::create();
         return $standaloneProductMapper;

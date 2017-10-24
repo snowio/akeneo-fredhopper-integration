@@ -6,11 +6,21 @@ use SnowIO\FredhopperDataModel\Attribute as FredhopperAttribute;
 
 class LocalizableAttributeMapper implements AttributeMapper
 {
-    public static function of(array $locales): self
+    public static function create(): self
     {
         $mapper = new self;
-        $mapper->locales = $locales;
         $mapper->typeMapper = StandardAttributeMapper::getDefaultTypeMapper();
+        return $mapper;
+    }
+
+    public static function of(array $locales): self
+    {
+        if (empty($locales)) {
+            throw new \InvalidArgumentException;
+        }
+
+        $mapper = self::create();
+        $mapper->locales = $locales;
         return $mapper;
     }
 
@@ -22,7 +32,8 @@ class LocalizableAttributeMapper implements AttributeMapper
     {
         $type = ($this->typeMapper)($akeneoAttribute->getType());
         $attributes = [];
-        foreach ($this->locales as $locale) {
+        $locales = $this->locales ?? \array_keys($akeneoAttribute->getLabels());
+        foreach ($locales as $locale) {
             $attributeId = "{$akeneoAttribute->getCode()}_" . \strtolower($locale);
             $attributes[] = FredhopperAttribute::of($attributeId, $type, $akeneoAttribute->getLabels());
         }

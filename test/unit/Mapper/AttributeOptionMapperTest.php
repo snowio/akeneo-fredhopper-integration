@@ -18,13 +18,13 @@ class AttributeOptionMapperTest extends TestCase
     }
 
     /**
-     * @dataProvider testMapDataProvider
+     * @dataProvider mapDataProvider
      */
     public function testMap(
         AkeneoAttributeOption $input,
         FredhopperAttributeOption $expected,
-        ?callable $attributeIdMapper,
-        ?callable $displayValueMapper
+        callable $attributeIdMapper = null,
+        callable $displayValueMapper = null
     ) {
         if ($attributeIdMapper !== null) {
             $this->attributeOptionMapper = $this
@@ -35,16 +35,16 @@ class AttributeOptionMapperTest extends TestCase
         if ($displayValueMapper !== null) {
             $this->attributeOptionMapper = $this
                 ->attributeOptionMapper
-                ->withAttributeIdMapper($displayValueMapper);
+                ->withDisplayValueMapper($displayValueMapper);
         }
 
-        $output = $this
+        $actual = $this
             ->attributeOptionMapper
             ->map($input);
-        self::assertEquals($expected->toJson(), $output->toJson());
+        self::assertEquals($expected->toJson(), $actual->toJson());
     }
 
-    public function testMapDataProvider()
+    public function mapDataProvider()
     {
         return [
             'noLabels' => [
@@ -63,7 +63,13 @@ class AttributeOptionMapperTest extends TestCase
                     ->withDisplayValue('Grand', 'fr_FR') //todo test locales that will change for fredhopper's case understand fr_FR
                     ->withDisplayValue('Large', 'en_GB'),
                 null,
-                null,
+                function (array $displayValues) {
+                    return [
+                        'en_GB' => $displayValues['en_GB'],
+                        'de_DE' => $displayValues['de_DE'],
+                        'fr_FR' => $displayValues['eu_FR'],
+                    ];
+                },
             ],
             'noLabelsWithAttributeIdMapper' => [
                 AkeneoAttributeOption::of(AttributeOptionIdentifier::of('size', 'large'))
@@ -77,7 +83,13 @@ class AttributeOptionMapperTest extends TestCase
                 function (string $attributeCode) {
                     return $attributeCode . '_modified';
                 },
-                null,
+                function (array $displayValues) {
+                    return [
+                        'en_GB' => $displayValues['en_GB'],
+                        'de_DE' => $displayValues['de_DE'],
+                        'fr_FR' => $displayValues['eu_FR'],
+                    ];
+                },
             ],
             'labelsWithDisplayValueMapper' => [
                 AkeneoAttributeOption::of(AttributeOptionIdentifier::of('size', 'large'))

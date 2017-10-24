@@ -10,7 +10,7 @@ use SnowIO\AkeneoDataModel\AttributeValue as AkeneoAttributeValue;
 
 class SimpleAttributeValueMapper implements AttributeValueMapper
 {
-    public static function create(): self
+    public static function create()
     {
         return FilterableAttributeValueMapper::of(
             new self,

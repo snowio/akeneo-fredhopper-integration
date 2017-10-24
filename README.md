@@ -1,0 +1,1 @@
+# snow-akeneo-fredhopper

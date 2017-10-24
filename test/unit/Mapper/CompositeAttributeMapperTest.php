@@ -17,26 +17,29 @@ class CompositeAttributeMapperTest extends TestCase
         $this->compositeAttributeMapper = CompositeAttributeMapper::create();
     }
 
-    public function testMap(AkeneoAttribute $akeneoAttribute, array $expectedFredhopperAttributes, array $mappers = [])
+    /**
+     * @dataProvider mapDataProvider
+     */
+    public function testMap(AkeneoAttribute $akeneoAttribute, array $expected, array $mappers = [])
     {
         foreach ($mappers as $mapper) {
             $this->compositeAttributeMapper = $this->compositeAttributeMapper->with($mapper);
         }
-        $outputFredhopperAttributes = $this->compositeAttributeMapper->map($akeneoAttribute);
+        $actual = $this->compositeAttributeMapper->map($akeneoAttribute);
         $renderJson = function (FredhopperAttribute $attribute) {
             return $attribute->toJson();
         };
-        self::assertEquals(\array_map($renderJson, $expectedFredhopperAttributes),\array_map($renderJson, $outputFredhopperAttributes));
+        self::assertEquals(\array_map($renderJson, $expected),\array_map($renderJson, $actual));
     }
 
-    public function testMapDataProvider()
+    public function mapDataProvider()
     {
         return  [
             'test-mulitple-mappers-on-attribute' => [
                 AkeneoAttribute::fromJson([
                     'code' => 'size',
                     'type' => AkeneoAttributeType::IDENTIFIER,
-                    'localizable' => true,
+                    'localizable' => false,
                     'scopable' => false,
                     'sort_order' => 3,
                     'labels' => [

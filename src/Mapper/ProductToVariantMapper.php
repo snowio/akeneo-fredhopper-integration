@@ -10,13 +10,13 @@ class ProductToVariantMapper
     {
         $variantMapper = new self;
         $variantMapper->skuToProductIdMapper = function (string $channel, string $sku) {
-            return "{$channel}_v_{$sku}";
+            return $sku;
         };
         $variantMapper->variantGroupCodeToProductIdMapper = function (string $channel, string $code) {
-            return "{$channel}_{$code}";
+            return $code;
         };
         $variantMapper->variantIdMapper = function (string $channel, string $sku) {
-            return "{$channel}_{$sku}";
+            return "v_{$sku}";
         };
         $variantMapper->attributeValueMapper = SimpleAttributeValueMapper::create();
         return $variantMapper;

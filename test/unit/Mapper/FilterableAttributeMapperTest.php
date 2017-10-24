@@ -22,45 +22,45 @@ class FilterableAttributeMapperTest extends TestCase
             });
     }
 
+    /**
+     * @dataProvider mapDataProvider
+     */
     public function testMap(
         AkeneoAttribute $akeneoAttribute,
-        array $expectedFredhopperAttributes
+        array $expected
     ) {
-        $outputFredhopperAttributes = $this->filterableAttributeMapper
+        $actual = $this->filterableAttributeMapper
             ->map($akeneoAttribute);
         $getJson = function (FredhopperAttribute $fredhopperAttribute) {
             return $fredhopperAttribute->toJson();
         };
 
-        self::assertEquals(array_map($getJson, $expectedFredhopperAttributes), array_map($getJson, $outputFredhopperAttributes));
+        self::assertEquals(array_map($getJson, $expected), array_map($getJson, $actual));
     }
 
-    public function testDataProvider()
+    public function mapDataProvider()
     {
         return [
             'testFilterByAttributeId' => [
                 AkeneoAttribute::fromJson([
                     'code' => 'size',
                     'type' => AkeneoAttributeType::SIMPLESELECT,
-                    'localizable' => true,
+                    'localizable' => false,
                     'scopable' => true,
                     'sort_order' => 34,
                     'labels' => [
                         'en_GB' => 'Size',
-                        'fr_Fr' => 'Taille',
+                        'fr_FR' => 'Taille',
                     ],
                     'group' => 'general',
                     '@timestamp' => 1508491122,
                 ]),
-                function (AkeneoAttribute $attribute) {
-                    return $attribute->getCode() === 'size';
-                },
                 [
                     FredhopperAttribute::of(
                         'size',
                         FredhopperAttributeType::LIST, [
                             'en_GB' => 'Size',
-                            'fr_Fr' => 'Taille',
+                            'fr_FR' => 'Taille',
                         ]
                     ),
                 ],
@@ -74,14 +74,11 @@ class FilterableAttributeMapperTest extends TestCase
                     'sort_order' => 34,
                     'labels' => [
                         'en_GB' => 'Colour',
-                        'fr_Fr' => 'Couleur',
+                        'fr_FR' => 'Couleur',
                     ],
                     'group' => 'swatch',
                     '@timestamp' => 1508491122,
                 ]),
-                function (AkeneoAttribute $attribute) {
-                    return $attribute->getCode() === 'size';
-                },
                 [],
             ],
         ];

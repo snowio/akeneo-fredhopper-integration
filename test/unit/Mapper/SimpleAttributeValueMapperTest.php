@@ -2,35 +2,29 @@
 namespace SnowIO\AkeneoFredhopper\Mapper;
 
 use PHPUnit\Framework\TestCase;
-use SnowIO\AkeneoDataModel\AttributeValue as AkeneoAttributeValue;
-use SnowIO\FredhopperDataModel\AttributeValue as FredhopperAttributeValue;
-use SnowIO\AkeneoDataModel\AttributeValueSet as AkeneoAttributeValueSet;
-use SnowIO\FredhopperDataModel\AttributeValueSet as FredhopperAttributeValueSet;
 
-class FilterableAttributeValueMapperTest extends TestCase
+use SnowIO\FredhopperDataModel\AttributeValue as FredhopperAttributeValue;
+use SnowIO\FredhopperDataModel\AttributeValueSet as FredhopperAttributeValueSet;
+use SnowIO\AkeneoDataModel\AttributeValueSet as AkeneoAttributeValueSet;
+
+
+class SimpleAttributeValueMapperTest extends TestCase
 {
-    /** @var FilterableAttributeValueMapper  */
-    private $filterableAttributeValueMapper;
+    /** @var  SimpleAttributeValueMapper */
+    private $simpleAttributeValueMapper;
 
     public function setUp()
     {
-        $this->filterableAttributeValueMapper = FilterableAttributeMapper::of(
-            SimpleAttributeValueMapper::create(),
-            function (AkeneoAttributeValue $akeneoAttributeValue) {
-                return $akeneoAttributeValue->getAttributeCode() === 'size';
-            }
-        );
+        $this->simpleAttributeValueMapper = SimpleAttributeValueMapper::create();
     }
 
     /**
      * @dataProvider mapDataProvider
      */
-    public function testMap(
-        AkeneoAttributeValueSet $akeneoAttributeValues,
-        FredhopperAttributeValueSet $expected
-    ) {
-        $actual = $this->filterableAttributeValueMapper->map($akeneoAttributeValues);
-        self::assertEquals($this->getJson($expected), $this->getJson($actual));
+    public function testMap(AkeneoAttributeValueSet $akeneoAttributeValues, FredhopperAttributeValueSet $expected)
+    {
+        $actual = $this->simpleAttributeValueMapper->map($akeneoAttributeValues);
+        self::assertEquals($this->getJson($actual), $this->getJson($expected));
     }
 
     private function getJson(FredhopperAttributeValueSet $attributeValueSet)
@@ -51,7 +45,7 @@ class FilterableAttributeValueMapperTest extends TestCase
                             'gbp' => 30,
                             'eur' => 37.45,
                         ],
-                        'weight' =>  30
+                        'weight' => 30
                     ],
                 ]),
                 FredhopperAttributeValueSet::of([
@@ -61,14 +55,25 @@ class FilterableAttributeValueMapperTest extends TestCase
             [
                 AkeneoAttributeValueSet::fromJson('main', [
                     'attribute_values' => [
+                        'size' => 'large',
                         'price' => [
                             'gbp' => 30,
                             'eur' => 37.45,
                         ],
+                        'weight' => 30
                     ],
                 ]),
-                FredhopperAttributeValueSet::of([]),
+                FredhopperAttributeValueSet::of([
+                    FredhopperAttributeValue::of('size', 'large'),
+                    FredhopperAttributeValue::of('price', [
+                        'gbp' => 30,
+                        'eur' => 37.45,
+                    ]),
+                    FredhopperAttributeValue::of('weight', 30),
+                ]),
             ],
+
         ];
     }
+
 }
