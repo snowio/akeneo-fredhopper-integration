@@ -1,15 +1,38 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: joshdifabio
- * Date: 23/10/2017
- * Time: 10:21
- */
-
 namespace SnowIO\AkeneoFredhopper\Recipe;
 
+use SnowIO\AkeneoDataModel\Attribute;
+use SnowIO\AkeneoDataModel\AttributeValue;
 
-class AttributeCodeFilter
+final class AttributeCodeFilter
 {
+    public static function of(callable $predicate): self
+    {
+        $whitelist = new self;
+        $whitelist->predicate = $predicate;
+        return $whitelist;
+    }
 
+    public function getAttributeFilter(): callable
+    {
+        return function (Attribute $akeneoAttribute): bool {
+            $attributeCode = $akeneoAttribute->getCode();
+            return ($this->predicate)($attributeCode);
+        };
+    }
+
+    public function getAttributeValueFilter(): callable
+    {
+        return function (AttributeValue $akeneoAttributValue): bool {
+            $attributeCode = $akeneoAttributValue->getAttributeCode();
+            return ($this->predicate)($attributeCode);
+        };
+    }
+
+    private function __construct()
+    {
+
+    }
+
+    private $predicate;
 }
