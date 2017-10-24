@@ -26,7 +26,7 @@ class ProductToVariantMapperTest extends TestCase
         callable $skuToProductIdMapper = null,
         callable $variantGroupCodeToProductIdMapper = null,
         callable $variantIdMapper = null,
-        SimpleAttributeValueMapper $attributeValueMapper = null
+        $attributeValueMapper = null
     ) {
         if ($skuToProductIdMapper !== null) {
             $this->productToVariantMapper = $this
@@ -142,7 +142,7 @@ class ProductToVariantMapperTest extends TestCase
                 function (string $channel, string $sku) {
                     return $sku . '_mapped';
                 },
-                null
+                SimpleAttributeValueMapper::create(),
             ],
 
         ];

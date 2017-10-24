@@ -51,7 +51,7 @@ class VariantGroupProductMapperTest extends TestCase
     public function mapDataProvider()
     {
         return [
-            [
+            'withMappers' => [
                 VariantGroup::of(SingleChannelVariantGroupData::fromJson([
                     'code' => '1001425',
                     'axis' => "size_config",
@@ -87,6 +87,36 @@ class VariantGroupProductMapperTest extends TestCase
                     return $code . '_modified';
                 },
                 SimpleAttributeValueMapper::create(),
+            ],
+            'withoutMappers' => [
+                VariantGroup::of(SingleChannelVariantGroupData::fromJson([
+                    'code' => '1001425',
+                    'axis' => "size_config",
+                    'channel' => "demontweeks",
+                    'attribute_values' => [
+                        'color' => 'blue'
+                    ],
+                    '@timestamp' => 1508491122,
+                ]))->withProductData(SingleChannelProductData::fromJson([
+                    'sku' => 'abc123',
+                    'channel' => 'main',
+                    'categories' => [
+                        ['mens', 't_shirts'],
+                        ['mens', 'summer_wear'],
+                    ],
+                    'family' => "mens_t_shirts",
+                    'attribute_values' => [
+                        'size' => 'large',
+                    ],
+                    'localizations' => [],
+                    'enabled' => true,
+                    '@timestamp' => 1508491122,
+                ])),
+                FredhopperProduct::of('1001425', [
+                    't_shirts', 'summer_wear'
+                ])->withAttributeValues(AttributeValueSet::of([
+                    FredhopperAttributeValue::of('color', 'blue'),
+                ])),
             ]
         ];
     }
