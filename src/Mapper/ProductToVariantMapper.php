@@ -59,7 +59,8 @@ class ProductToVariantMapper
         return $result;
     }
 
-    public function withAttributeValueMapper(SimpleAttributeValueMapper $attributeValueMapper): self
+    //todo test this
+    public function withAttributeValueMapper($attributeValueMapper): self
     {
         $result = clone $this;
         $result->attributeValueMapper = $attributeValueMapper;

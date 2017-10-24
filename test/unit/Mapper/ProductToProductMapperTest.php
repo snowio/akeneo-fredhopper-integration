@@ -24,7 +24,8 @@ class ProductToProductMapperTest extends TestCase
         SingleChannelProductData $akeneoProductData,
         FredhopperProduct $expected,
         callable $categoryIdMapper = null,
-        callable $productIdMapper = null
+        callable $productIdMapper = null,
+        $attributeValueMapper = null
     ) {
         if (null !== $categoryIdMapper) {
             $this->productToProductMapper = $this->productToProductMapper
@@ -34,6 +35,11 @@ class ProductToProductMapperTest extends TestCase
         if (null !== $productIdMapper) {
             $this->productToProductMapper = $this->productToProductMapper
                 ->withProductIdMapper($productIdMapper);
+        }
+
+        if (null !== $attributeValueMapper) {
+            $this->productToProductMapper = $this->productToProductMapper
+                ->withAttributeValueMapper($attributeValueMapper);
         }
 
         $actual = $this->productToProductMapper->map($akeneoProductData);
@@ -94,7 +100,7 @@ class ProductToProductMapperTest extends TestCase
                 function (string $channel, string $sku) {
                     return $sku . '_mapped';
                 },
-                null,
+                SimpleAttributeValueMapper::create(),
             ],
         ];
     }

@@ -27,7 +27,7 @@ class VariantGroupProductMapperTest extends TestCase
         FredhopperProduct $expected,
         callable $categoryIdMapper = null,
         callable $productIdMapper = null,
-        SimpleAttributeValueMapper $attributeValueMapper = null
+        $attributeValueMapper = null
     ) {
         if ($productIdMapper !== null) {
             $this->variantGroupToProductMapper = $this->variantGroupToProductMapper
@@ -75,14 +75,18 @@ class VariantGroupProductMapperTest extends TestCase
                     'enabled' => true,
                     '@timestamp' => 1508491122,
                 ])),
-                FredhopperProduct::of('1001425', [
-                    't_shirts', 'summer_wear'
+                FredhopperProduct::of('1001425_modified', [
+                    't_shirts_modified', 'summer_wear_modified'
                 ])->withAttributeValues(AttributeValueSet::of([
                     FredhopperAttributeValue::of('color', 'blue'),
                 ])),
-                null,
-                null,
-                null,
+                function (string $categoryId) {
+                    return $categoryId . '_modified';
+                },
+                function (string $code) {
+                    return $code . '_modified';
+                },
+                SimpleAttributeValueMapper::create(),
             ]
         ];
     }
