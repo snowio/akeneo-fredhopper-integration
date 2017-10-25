@@ -64,10 +64,9 @@ class StandardAttributeMapper implements AttributeMapper
     public static function getDefaultTypeMapper(): callable
     {
         $typeMap = [
-            AkeneoAttributeType::IDENTIFIER => FredhopperAttributeType::TEXT,
             AkeneoAttributeType::SIMPLESELECT => FredhopperAttributeType::LIST,
             AkeneoAttributeType::BOOLEAN => FredhopperAttributeType::INT,
-            AkeneoAttributeType::BOOLEAN => FredhopperAttributeType::INT,
+            AkeneoAttributeType::NUMBER => FredhopperAttributeType::INT,
             AkeneoAttributeType::PRICE_COLLECTION => FredhopperAttributeType::FLOAT,
             AkeneoAttributeType::MULTISELECT => FredhopperAttributeType::SET,
         ];
