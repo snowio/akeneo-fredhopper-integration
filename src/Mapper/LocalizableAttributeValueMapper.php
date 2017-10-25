@@ -6,7 +6,7 @@ use SnowIO\AkeneoDataModel\AttributeValueSet as AkeneoAttributeValueSet;
 use SnowIO\FredhopperDataModel\AttributeValue as FredhopperAttributeValue;
 use SnowIO\FredhopperDataModel\AttributeValueSet as FredhopperAttributeValueSet;
 
-class LocalizedAttributeValueMapper implements AttributeValueMapper
+class LocalizableAttributeValueMapper implements AttributeValueMapper
 {
     public static function create()
     {
@@ -20,17 +20,17 @@ class LocalizedAttributeValueMapper implements AttributeValueMapper
 
     public function map(AkeneoAttributeValueSet $akeneoAttributeValues): FredhopperAttributeValueSet
     {
-        $fredhopperLocalisedAttributeValues = [];
+        $fredhopperLocalizedAttributeValues = [];
         /** @var AkeneoAttributeValue $akeneoAttributeValue */
         foreach ($akeneoAttributeValues as $akeneoAttributeValue) {
             $locale = $akeneoAttributeValue->getScope()
                 ->getLocale();
             $attributeId = "{$akeneoAttributeValue->getAttributeCode()}_" . \strtolower($locale);
             $value = $akeneoAttributeValue->getValue();
-            $fredhopperLocalisedAttributeValues[] = FredhopperAttributeValue::of($attributeId, $value);
+            $fredhopperLocalizedAttributeValues[] = FredhopperAttributeValue::of($attributeId, $value);
         }
 
-        return FredhopperAttributeValueSet::of($fredhopperLocalisedAttributeValues);
+        return FredhopperAttributeValueSet::of($fredhopperLocalizedAttributeValues);
     }
 
     private function __construct()

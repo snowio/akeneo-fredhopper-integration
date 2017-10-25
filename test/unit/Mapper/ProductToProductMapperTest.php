@@ -2,48 +2,36 @@
 namespace SnowIO\AkeneoFredhopper\Mapper;
 
 use PHPUnit\Framework\TestCase;
-use SnowIO\AkeneoDataModel\SingleChannelProductData;
+use SnowIO\AkeneoDataModel\ProductData as AkeneoProductData;
 use SnowIO\FredhopperDataModel\AttributeValue;
-use SnowIO\FredhopperDataModel\AttributeValueSet;
 use SnowIO\FredhopperDataModel\CategoryIdSet;
 use SnowIO\FredhopperDataModel\ProductData as FredhopperProduct;
 
 class ProductToProductMapperTest extends TestCase
 {
-    /** @var ProductToProductMapper */
-    private $productToProductMapper;
-
-    public function setUp()
-    {
-        $this->productToProductMapper = ProductToProductMapper::create();
-    }
-
     /**
      * @dataProvider mapDataProvider
      */
     public function testMap(
-        SingleChannelProductData $akeneoProductData,
+        AkeneoProductData $akeneoProductData,
         FredhopperProduct $expected,
         callable $categoryIdMapper = null,
         callable $productIdMapper = null,
         $attributeValueMapper = null
     ) {
+        $productToProductMapper = ProductToProductMapper::create();
+
         if (null !== $categoryIdMapper) {
-            $this->productToProductMapper = $this->productToProductMapper
-                ->withCategoryIdMapper($categoryIdMapper);
+            $productToProductMapper = $productToProductMapper->withCategoryIdMapper($categoryIdMapper);
         }
-
         if (null !== $productIdMapper) {
-            $this->productToProductMapper = $this->productToProductMapper
-                ->withProductIdMapper($productIdMapper);
+            $productToProductMapper = $productToProductMapper->withProductIdMapper($productIdMapper);
         }
-
         if (null !== $attributeValueMapper) {
-            $this->productToProductMapper = $this->productToProductMapper
-                ->withAttributeValueMapper($attributeValueMapper);
+            $productToProductMapper = $productToProductMapper->withAttributeValueMapper($attributeValueMapper);
         }
 
-        $actual = $this->productToProductMapper->map($akeneoProductData);
+        $actual = $productToProductMapper->map($akeneoProductData);
         self::assertTrue($actual->equals($expected));
     }
 
@@ -51,7 +39,7 @@ class ProductToProductMapperTest extends TestCase
     {
         return [
             'testWithDefaultMappers' => [
-                SingleChannelProductData::fromJson([
+                AkeneoProductData::fromJson([
                     'sku' => 'abc123',
                     'channel' => 'main',
                     'categories' => [
@@ -74,7 +62,7 @@ class ProductToProductMapperTest extends TestCase
                 null,
             ],
             'testWithCustomMappers' => [
-                SingleChannelProductData::fromJson([
+                AkeneoProductData::fromJson([
                     'sku' => 'abc123',
                     'channel' => 'main',
                     'categories' => [

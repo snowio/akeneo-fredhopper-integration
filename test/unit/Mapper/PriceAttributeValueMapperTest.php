@@ -8,20 +8,12 @@ use SnowIO\AkeneoDataModel\AttributeValueSet as AkeneoAttributeValueSet;
 
 class PriceAttributeValueMapperTest extends TestCase
 {
-    /** @var  PriceAttributeValueMapper */
-    private $priceAttributeValueMapper;
-
-    public function setUp()
-    {
-        $this->priceAttributeValueMapper = PriceAttributeValueMapper::create();
-    }
-
     /**
      * @dataProvider mapDataProvider
      */
     public function testMap(AkeneoAttributeValueSet $akeneoAttributeValues, FredhopperAttributeValueSet $expected)
     {
-        $actual = $this->priceAttributeValueMapper->map($akeneoAttributeValues);
+        $actual = PriceAttributeValueMapper::create()->map($akeneoAttributeValues);
         self::assertTrue($actual->equals($expected));
     }
 

@@ -2,7 +2,7 @@
 namespace SnowIO\AkeneoFredhopper\Mapper;
 
 use PHPUnit\Framework\TestCase;
-use SnowIO\AkeneoDataModel\Attribute as AkeneoAttribute;
+use SnowIO\AkeneoDataModel\AttributeData as AkeneoAttribute;
 use SnowIO\AkeneoDataModel\AttributeType as AkeneoAttributeType;
 use SnowIO\FredhopperDataModel\AttributeType as FredhopperAttributeType;
 use SnowIO\FredhopperDataModel\AttributeData as FredhopperAttribute;
@@ -10,23 +10,16 @@ use SnowIO\FredhopperDataModel\InternationalizedString;
 
 class CompositeAttributeMapperTest extends TestCase
 {
-    /** @var CompositeAttributeMapper */
-    private $compositeAttributeMapper;
-
-    public function setUp()
-    {
-        $this->compositeAttributeMapper = CompositeAttributeMapper::create();
-    }
-
     /**
      * @dataProvider mapDataProvider
      */
     public function testMap(AkeneoAttribute $akeneoAttribute, array $expected, array $mappers = [])
     {
+        $compositeAttributeMapper = CompositeAttributeMapper::create();
         foreach ($mappers as $mapper) {
-            $this->compositeAttributeMapper = $this->compositeAttributeMapper->with($mapper);
+            $compositeAttributeMapper = $compositeAttributeMapper->with($mapper);
         }
-        $actual = $this->compositeAttributeMapper->map($akeneoAttribute);
+        $actual = $compositeAttributeMapper->map($akeneoAttribute);
         $renderJson = function (FredhopperAttribute $attribute) {
             return $attribute->toJson();
         };

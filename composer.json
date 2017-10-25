@@ -1,6 +1,6 @@
 {
     "require": {
-        "snowio/akeneo-data-model": "dev-master",
+        "snowio/akeneo-data-model": "^0.1.2",
         "snowio/fredhopper-data-model": "^0.1"
     },
     "require-dev": {

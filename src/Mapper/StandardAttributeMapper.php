@@ -1,11 +1,13 @@
 <?php
 namespace SnowIO\AkeneoFredhopper\Mapper;
 
-use SnowIO\AkeneoDataModel\Attribute as AkeneoAttribute;
+use SnowIO\AkeneoDataModel\AttributeData as AkeneoAttributeData;
 use SnowIO\AkeneoDataModel\AttributeType as AkeneoAttributeType;
+use SnowIO\AkeneoDataModel\InternationalizedString as AkeneoInternationalizedString;
+use SnowIO\AkeneoDataModel\LocalizedString;
 use SnowIO\FredhopperDataModel\AttributeType as FredhopperAttributeType;
 use SnowIO\FredhopperDataModel\AttributeData as FredhopperAttributeData;
-use SnowIO\FredhopperDataModel\InternationalizedString;
+use SnowIO\FredhopperDataModel\InternationalizedString as FredhopperInternationalizedString;
 
 class StandardAttributeMapper implements AttributeMapper
 {
@@ -16,24 +18,25 @@ class StandardAttributeMapper implements AttributeMapper
         $mapper->attributeIdMapper = function (string $code) {
             return $code;
         };
-        $mapper->nameMapper = function (array $names) {
-            $result = InternationalizedString::create();
-            foreach ($names as $locale => $displayValue) {
-                $result = $result->withValue($displayValue, $locale);
+        $mapper->nameMapper = function (AkeneoInternationalizedString $labels) {
+            $result = FredhopperInternationalizedString::create();
+            /** @var LocalizedString $label */
+            foreach ($labels as $label) {
+                $result = $result->withValue($label->getValue(), $label->getLocale());
             }
             return $result;
         };
         return $mapper;
     }
 
-    public function map(AkeneoAttribute $akeneoAttribute): array
+    public function map(AkeneoAttributeData $akeneoAttributeData): array
     {
-        $attributeId = ($this->attributeIdMapper)($akeneoAttribute->getCode());
-        $labels = ($this->nameMapper)($akeneoAttribute->getLabels());
-        if ($akeneoAttribute->isLocalizable()) {
+        $attributeId = ($this->attributeIdMapper)($akeneoAttributeData->getCode());
+        $labels = ($this->nameMapper)($akeneoAttributeData->getLabels());
+        if ($akeneoAttributeData->isLocalizable()) {
             return [FredhopperAttributeData::of($attributeId, FredhopperAttributeType::ASSET, $labels)];
         }
-        $fredhopperType = ($this->typeMapper)($akeneoAttribute->getType());
+        $fredhopperType = ($this->typeMapper)($akeneoAttributeData->getType());
         return [FredhopperAttributeData::of($attributeId, $fredhopperType, $labels)];
     }
 

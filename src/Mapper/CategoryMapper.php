@@ -1,9 +1,11 @@
 <?php
 namespace SnowIO\AkeneoFredhopper\Mapper;
 
-use SnowIO\AkeneoDataModel\Category as AkeneoCategory;
+use SnowIO\AkeneoDataModel\CategoryData as AkeneoCategoryData;
+use SnowIO\AkeneoDataModel\InternationalizedString as AkeneoInternationalizedString;
+use SnowIO\AkeneoDataModel\LocalizedString;
 use SnowIO\FredhopperDataModel\CategoryData as FredhopperCategoryData;
-use SnowIO\FredhopperDataModel\InternationalizedString;
+use SnowIO\FredhopperDataModel\InternationalizedString as FredhopperInternationalizedString;
 
 class CategoryMapper
 {
@@ -11,17 +13,18 @@ class CategoryMapper
     {
         $mapper = new self;
         $mapper->categoryIdMapper = function (string $categoryCode) { return $categoryCode; };
-        $mapper->nameMapper = function (array $names) {
-            $result = InternationalizedString::create();
-            foreach ($names as $locale => $name) {
-                $result = $result->withValue($name, $locale);
+        $mapper->nameMapper = function (AkeneoInternationalizedString $labels) {
+            $result = FredhopperInternationalizedString::create();
+            /** @var LocalizedString $label */
+            foreach ($labels as $label) {
+                $result = $result->withValue($label->getValue(), $label->getLocale());
             }
             return $result;
         };
         return $mapper;
     }
 
-    public function map(AkeneoCategory $akeneoCategory): FredhopperCategoryData
+    public function map(AkeneoCategoryData $akeneoCategory): FredhopperCategoryData
     {
         $categoryId = ($this->categoryIdMapper)($akeneoCategory->getCode());
         $names = ($this->nameMapper)($akeneoCategory->getLabels());

@@ -2,7 +2,7 @@
 namespace SnowIO\AkeneoFredhopper\Mapper;
 
 use PHPUnit\Framework\TestCase;
-use SnowIO\AkeneoDataModel\Attribute as AkeneoAttribute;
+use SnowIO\AkeneoDataModel\AttributeData as AkeneoAttribute;
 use SnowIO\AkeneoDataModel\AttributeType as AkeneoAttributeType;
 use SnowIO\FredhopperDataModel\AttributeType as FredhopperAttributeType;
 use SnowIO\FredhopperDataModel\AttributeData as FredhopperAttribute;
@@ -10,7 +10,6 @@ use SnowIO\FredhopperDataModel\InternationalizedString;
 
 class LocalizableAttributeMapperTest extends TestCase
 {
-
     /**
      * @dataProvider mapDataProvider
      */

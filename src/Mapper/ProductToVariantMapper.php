@@ -1,7 +1,7 @@
 <?php
 namespace SnowIO\AkeneoFredhopper\Mapper;
 
-use SnowIO\AkeneoDataModel\SingleChannelProductData;
+use SnowIO\AkeneoDataModel\ProductData as AkeneoProductData;
 use SnowIO\FredhopperDataModel\VariantData as FredhopperVariantData;
 
 class ProductToVariantMapper
@@ -22,7 +22,7 @@ class ProductToVariantMapper
         return $variantMapper;
     }
 
-    public function map(SingleChannelProductData $akeneoProductData): ?FredhopperVariantData
+    public function map(AkeneoProductData $akeneoProductData): ?FredhopperVariantData
     {
         $channel = $akeneoProductData->getChannel();
         $sku = $akeneoProductData->getSku();

@@ -2,56 +2,39 @@
 namespace SnowIO\AkeneoFredhopper\Mapper;
 
 use PHPUnit\Framework\TestCase;
-use SnowIO\AkeneoDataModel\SingleChannelProductData;
+use SnowIO\AkeneoDataModel\ProductData as AkeneoProductData;
 use SnowIO\FredhopperDataModel\AttributeValue;
 use SnowIO\FredhopperDataModel\VariantData as FredhopperVariant;
 
 class ProductToVariantMapperTest extends TestCase
 {
-    /** @var ProductToVariantMapper */
-    private $productToVariantMapper;
-
-    public function setUp()
-    {
-        $this->productToVariantMapper = ProductToVariantMapper::create();
-    }
-
     /**
      * @dataProvider mapDataProvider
      */
     public function testMap(
-        SingleChannelProductData $akeneoProduct,
+        AkeneoProductData $akeneoProduct,
         FredhopperVariant $expected,
         callable $skuToProductIdMapper = null,
         callable $variantGroupCodeToProductIdMapper = null,
         callable $variantIdMapper = null,
         $attributeValueMapper = null
     ) {
+        $productToVariantMapper = ProductToVariantMapper::create();;
+
         if ($skuToProductIdMapper !== null) {
-            $this->productToVariantMapper = $this
-                ->productToVariantMapper
-                ->withSkuToProductIdMapper($skuToProductIdMapper);
+            $productToVariantMapper = $productToVariantMapper->withSkuToProductIdMapper($skuToProductIdMapper);
         }
-
         if ($variantGroupCodeToProductIdMapper !== null) {
-            $this->productToVariantMapper = $this
-                ->productToVariantMapper
-                ->withVariantGroupCodeToProductIdMapper($variantGroupCodeToProductIdMapper);
+            $productToVariantMapper = $productToVariantMapper->withVariantGroupCodeToProductIdMapper($variantGroupCodeToProductIdMapper);
         }
-
         if ($variantIdMapper !== null) {
-            $this->productToVariantMapper = $this
-                ->productToVariantMapper
-                ->withSkuToVariantIdMapper($variantIdMapper);
+            $productToVariantMapper = $productToVariantMapper->withSkuToVariantIdMapper($variantIdMapper);
         }
-
         if ($attributeValueMapper !== null) {
-            $this->productToVariantMapper = $this
-                ->productToVariantMapper
-                ->withAttributeValueMapper($attributeValueMapper);
+            $productToVariantMapper = $productToVariantMapper->withAttributeValueMapper($attributeValueMapper);
         }
 
-        $actual = $this->productToVariantMapper->map($akeneoProduct);
+        $actual = $productToVariantMapper->map($akeneoProduct);
         self::assertEquals($expected, $actual);
     }
 
@@ -59,7 +42,7 @@ class ProductToVariantMapperTest extends TestCase
     {
         return [
             'testVariantsWithDefaultMappers' => [
-                SingleChannelProductData::fromJson([
+                AkeneoProductData::fromJson([
                     'sku' => 'abc123',
                     'channel' => 'main',
                     'categories' => [
@@ -81,7 +64,7 @@ class ProductToVariantMapperTest extends TestCase
                 null,
             ],
             'testStandaloneProductWithDefaultMappers' => [
-                SingleChannelProductData::fromJson([
+                AkeneoProductData::fromJson([
                     'sku' => 'abc123',
                     'channel' => 'main',
                     'categories' => [
@@ -103,7 +86,7 @@ class ProductToVariantMapperTest extends TestCase
                 null,
             ],
             'testStandaloneProductWithCustomMappers' => [
-                SingleChannelProductData::fromJson([
+                AkeneoProductData::fromJson([
                     'sku' => 'abc123',
                     'channel' => 'main',
                     'categories' => [

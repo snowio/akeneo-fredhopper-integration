@@ -3,7 +3,7 @@ namespace SnowIO\AkeneoFredhopper\Mapper;
 
 use SnowIO\AkeneoDataModel\AttributeValueSet as AkeneoAttributeValueSet;
 use SnowIO\AkeneoDataModel\Price;
-use SnowIO\AkeneoDataModel\PriceSet;
+use SnowIO\AkeneoDataModel\PriceCollection;
 use SnowIO\FredhopperDataModel\AttributeValueSet as FredhopperAttributeValueSet;
 use SnowIO\AkeneoDataModel\AttributeValue as AkeneoAttributeValue;
 use SnowIO\FredhopperDataModel\AttributeValue as FredhopperAttributeValue;
@@ -15,7 +15,7 @@ class PriceAttributeValueMapper implements AttributeValueMapper
         return AttributeValueMapperWithFilter::of(
             new self,
             function (AkeneoAttributeValue $akeneoAttributeValue) {
-                return $akeneoAttributeValue->getValue() instanceof PriceSet;
+                return $akeneoAttributeValue->getValue() instanceof PriceCollection;
             }
         );
     }
@@ -25,7 +25,7 @@ class PriceAttributeValueMapper implements AttributeValueMapper
         $fredhopperPriceAttributeValues = [];
         /** @var AkeneoAttributeValue $akeneoAttributeValue */
         foreach ($akeneoAttributeValues as $akeneoAttributeValue) {
-            /** @var PriceSet $value */
+            /** @var PriceCollection $prices */
             $prices = $akeneoAttributeValue->getValue();
             /** @var Price $price */
             foreach ($prices as $price) {

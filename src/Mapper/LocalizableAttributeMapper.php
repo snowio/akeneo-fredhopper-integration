@@ -1,9 +1,11 @@
 <?php
 namespace SnowIO\AkeneoFredhopper\Mapper;
 
-use SnowIO\AkeneoDataModel\Attribute as AkeneoAttribute;
+use SnowIO\AkeneoDataModel\AttributeData as AkeneoAttributeData;
+use SnowIO\AkeneoDataModel\InternationalizedString as AkeneoInternationalizedString;
+use SnowIO\AkeneoDataModel\LocalizedString;
 use SnowIO\FredhopperDataModel\AttributeData as FredhopperAttributeData;
-use SnowIO\FredhopperDataModel\InternationalizedString;
+use SnowIO\FredhopperDataModel\InternationalizedString as FredhopperInternationalizedString;
 
 class LocalizableAttributeMapper implements AttributeMapper
 {
@@ -11,10 +13,11 @@ class LocalizableAttributeMapper implements AttributeMapper
     {
         $mapper = new self;
         $mapper->typeMapper = StandardAttributeMapper::getDefaultTypeMapper();
-        $mapper->nameMapper = function (array $names) {
-            $result = InternationalizedString::create();
-            foreach ($names as $locale => $name) {
-                $result = $result->withValue($name, $locale);
+        $mapper->nameMapper = function (AkeneoInternationalizedString $labels) {
+            $result = FredhopperInternationalizedString::create();
+            /** @var LocalizedString $label */
+            foreach ($labels as $label) {
+                $result = $result->withValue($label->getValue(), $label->getLocale());
             }
             return $result;
         };
@@ -33,17 +36,16 @@ class LocalizableAttributeMapper implements AttributeMapper
     }
 
     /**
-     * @param AkeneoAttribute $akeneoAttribute
      * @return FredhopperAttributeData[]
      */
-    public function map(AkeneoAttribute $akeneoAttribute): array
+    public function map(AkeneoAttributeData $akeneoAttributeData): array
     {
-        $type = ($this->typeMapper)($akeneoAttribute->getType());
+        $type = ($this->typeMapper)($akeneoAttributeData->getType());
         $attributes = [];
-        $locales = $this->locales ?? \array_keys($akeneoAttribute->getLabels());
+        $locales = $this->locales ?? $akeneoAttributeData->getLabels()->getLocales();
         foreach ($locales as $locale) {
-            $attributeId = "{$akeneoAttribute->getCode()}_" . \strtolower($locale);
-            $names = ($this->nameMapper)($akeneoAttribute->getLabels());
+            $attributeId = "{$akeneoAttributeData->getCode()}_" . \strtolower($locale);
+            $names = ($this->nameMapper)($akeneoAttributeData->getLabels());
             $attributes[] = FredhopperAttributeData::of($attributeId, $type, $names);
         }
         return $attributes;

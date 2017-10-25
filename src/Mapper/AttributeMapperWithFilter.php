@@ -1,7 +1,7 @@
 <?php
 namespace SnowIO\AkeneoFredhopper\Mapper;
 
-use SnowIO\AkeneoDataModel\Attribute as AkeneoAttribute;
+use SnowIO\AkeneoDataModel\AttributeData;
 
 class AttributeMapperWithFilter implements AttributeMapper
 {
@@ -13,18 +13,17 @@ class AttributeMapperWithFilter implements AttributeMapper
         return $filterableAttributeMapper;
     }
 
-    public function map(AkeneoAttribute $akeneoAttribute): array
+    public function map(AttributeData $akeneoAttributeData): array
     {
-        $filterResult = ($this->filter)($akeneoAttribute);
+        $filterResult = ($this->filter)($akeneoAttributeData);
         if (!$filterResult) {
             return [];
         }
-        return $this->mapper->map($akeneoAttribute);
+        return $this->mapper->map($akeneoAttributeData);
     }
 
     /** @var  AttributeMapper */
     private $mapper;
-
     /** @var callable */
     private $filter;
 

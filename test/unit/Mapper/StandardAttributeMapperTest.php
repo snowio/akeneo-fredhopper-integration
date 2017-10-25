@@ -2,22 +2,15 @@
 namespace SnowIO\AkeneoFredhopper\Mapper;
 
 use PHPUnit\Framework\TestCase;
-use SnowIO\AkeneoDataModel\Attribute as AkeneoAttribute;
+use SnowIO\AkeneoDataModel\AttributeData as AkeneoAttribute;
 use SnowIO\AkeneoDataModel\AttributeType as AkeneoAttributeType;
+use SnowIO\AkeneoDataModel\InternationalizedString as AkeneoInternationalizedString;
 use SnowIO\FredhopperDataModel\AttributeData as FredhopperAttribute;
 use SnowIO\FredhopperDataModel\AttributeType as FredhopperAttributeType;
-use SnowIO\FredhopperDataModel\InternationalizedString;
+use SnowIO\FredhopperDataModel\InternationalizedString as FredhopperInternationalizedString;
 
 class StandardAttributeMapperTest extends TestCase
 {
-    /** @var  StandardAttributeMapper */
-    private $standardAttributeMapper;
-
-    public function setUp()
-    {
-        $this->standardAttributeMapper = StandardAttributeMapper::create();
-    }
-
     /**
      * @dataProvider mapDataProvider
      */
@@ -28,23 +21,19 @@ class StandardAttributeMapperTest extends TestCase
         callable $typeMapper = null,
         callable $nameMapper = null
     ) {
+        $attributeMapper = StandardAttributeMapper::create();
 
         if (null !== $attributeIdMapper) {
-            $this->standardAttributeMapper = $this->standardAttributeMapper
-                ->withAttributeIdMapper($attributeIdMapper);
+            $attributeMapper = $attributeMapper->withAttributeIdMapper($attributeIdMapper);
         }
-
         if (null !== $typeMapper) {
-            $this->standardAttributeMapper = $this->standardAttributeMapper
-                ->withTypeMapper($typeMapper);
+            $attributeMapper = $attributeMapper->withTypeMapper($typeMapper);
         }
-
         if (null !== $nameMapper) {
-            $this->standardAttributeMapper = $this->standardAttributeMapper
-                ->withNameMapper($nameMapper);
+            $attributeMapper = $attributeMapper->withNameMapper($nameMapper);
         }
 
-        $actual = $this->standardAttributeMapper->map($akeneoAttribute);
+        $actual = $attributeMapper->map($akeneoAttribute);
         self::assertEquals($this->getJson($expected), $this->getJson($actual));
     }
 
@@ -76,7 +65,7 @@ class StandardAttributeMapperTest extends TestCase
                     FredhopperAttribute::of(
                         'size',
                         FredhopperAttributeType::ASSET,
-                        InternationalizedString::create()
+                        FredhopperInternationalizedString::create()
                             ->withValue('Size', 'en_GB')
                             ->withValue('Taille', 'fr_FR')
                     ),
@@ -103,7 +92,7 @@ class StandardAttributeMapperTest extends TestCase
                     FredhopperAttribute::of(
                         'size',
                         FredhopperAttributeType::LIST,
-                        InternationalizedString::create()
+                        FredhopperInternationalizedString::create()
                             ->withValue('Size', 'en_GB')
                             ->withValue('Taille', 'fr_FR')
                     ),
@@ -130,7 +119,7 @@ class StandardAttributeMapperTest extends TestCase
                     FredhopperAttribute::of(
                         'size_mapped',
                         FredhopperAttributeType::ASSET,
-                        InternationalizedString::create()->withValue('Size', 'en_GB')
+                        FredhopperInternationalizedString::create()->withValue('Size', 'en_GB')
                     ),
                 ],
                 function (string $attributeIdMapper) {
@@ -139,8 +128,8 @@ class StandardAttributeMapperTest extends TestCase
                 function (string $typeMapper) {
                     return FredhopperAttributeType::ASSET;
                 },
-                function (array $name) {
-                    return InternationalizedString::create()->withValue($name['en_GB'], 'en_GB');
+                function (AkeneoInternationalizedString $labels) {
+                    return FredhopperInternationalizedString::create()->withValue($labels->getValue('en_GB'), 'en_GB');
                 }
             ],
         ];

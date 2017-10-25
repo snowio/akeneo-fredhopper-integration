@@ -1,7 +1,7 @@
 <?php
 namespace SnowIO\AkeneoFredhopper\Mapper;
 
-use SnowIO\AkeneoDataModel\Attribute as AkeneoAttribute;
+use SnowIO\AkeneoDataModel\AttributeData as AkeneoAttributeData;
 
 class CompositeAttributeMapper implements AttributeMapper
 {
@@ -10,14 +10,12 @@ class CompositeAttributeMapper implements AttributeMapper
         return new self;
     }
 
-    public function map(AkeneoAttribute $akeneoAttribute): array
+    public function map(AkeneoAttributeData $akeneoAttributeData): array
     {
         $fredhopperAttributes = [];
-
         foreach ($this->mappers as $mapper) {
-            $fredhopperAttributes = array_merge($fredhopperAttributes, $mapper->map($akeneoAttribute));
+            $fredhopperAttributes = \array_merge($fredhopperAttributes, $mapper->map($akeneoAttributeData));
         }
-
         return $fredhopperAttributes;
     }
 

@@ -1,11 +1,13 @@
 <?php
 namespace SnowIO\AkeneoFredhopper\Mapper;
 
-use SnowIO\AkeneoDataModel\Attribute as AkeneoAttribute;
+use SnowIO\AkeneoDataModel\AttributeData as AkeneoAttributeData;
+use SnowIO\AkeneoDataModel\InternationalizedString as AkeneoInternationalizedString;
+use SnowIO\AkeneoDataModel\LocalizedString;
 use SnowIO\FredhopperDataModel\AttributeData as FredhopperAttributeData;
 use SnowIO\AkeneoDataModel\AttributeType as AkeneoAttributeType;
 use SnowIO\FredhopperDataModel\AttributeType as FredhopperAttributeType;
-use SnowIO\FredhopperDataModel\InternationalizedString;
+use SnowIO\FredhopperDataModel\InternationalizedString as FredhopperInternationalizedString;
 
 class PriceAttributeMapper implements AttributeMapper
 {
@@ -13,10 +15,11 @@ class PriceAttributeMapper implements AttributeMapper
     {
         $mapper = new self;
         $mapper->currencies = $currencies;
-        $mapper->nameMapper = function (array $names) {
-            $result = InternationalizedString::create();
-            foreach ($names as $locale => $name) {
-                $result = $result->withValue($name, $locale);
+        $mapper->nameMapper = function (AkeneoInternationalizedString $labels) {
+            $result = FredhopperInternationalizedString::create();
+            /** @var LocalizedString $label */
+            foreach ($labels as $label) {
+                $result = $result->withValue($label->getValue(), $label->getLocale());
             }
             return $result;
         };
@@ -24,20 +27,19 @@ class PriceAttributeMapper implements AttributeMapper
     }
 
     /**
-     * @param AkeneoAttribute $akeneoAttribute
      * @return FredhopperAttributeData[]
      * @throws \Error
      */
-    public function map(AkeneoAttribute $akeneoAttribute): array
+    public function map(AkeneoAttributeData $akeneoAttributeData): array
     {
-        if ($akeneoAttribute->getType() !== AkeneoAttributeType::PRICE_COLLECTION) {
+        if ($akeneoAttributeData->getType() !== AkeneoAttributeType::PRICE_COLLECTION) {
             throw new \Error;
         }
 
         $attributes = [];
         foreach ($this->currencies as $currency) {
-            $attributeId = "{$akeneoAttribute->getCode()}_" . \strtolower($currency);
-            $attributeNames = ($this->nameMapper)($akeneoAttribute->getLabels());
+            $attributeId = "{$akeneoAttributeData->getCode()}_" . \strtolower($currency);
+            $attributeNames = ($this->nameMapper)($akeneoAttributeData->getLabels());
             $attributes[] = FredhopperAttributeData::of($attributeId, FredhopperAttributeType::FLOAT, $attributeNames);
         }
         return $attributes;

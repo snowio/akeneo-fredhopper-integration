@@ -6,22 +6,14 @@ use SnowIO\AkeneoDataModel\AttributeValueSet as AkeneoAttributeValueSet;
 use SnowIO\FredhopperDataModel\AttributeValue as FredhopperAttributeValue;
 use SnowIO\FredhopperDataModel\AttributeValueSet as FredhopperAttributeValueSet;
 
-class LocalizedAttributeValueMapperTest extends TestCase
+class LocalizableAttributeValueMapperTest extends TestCase
 {
-    /** @var  LocalizedAttributeValueMapper */
-    private $localizableAttributeValueMapper;
-
-    public function setUp()
-    {
-        $this->localizableAttributeValueMapper = LocalizedAttributeValueMapper::create();
-    }
-
     /**
      * @dataProvider mapDataProvider
      */
     public function testMap(AkeneoAttributeValueSet $akeneoAttributeValues, FredhopperAttributeValueSet $expected)
     {
-        $actual = $this->localizableAttributeValueMapper->map($akeneoAttributeValues);
+        $actual = LocalizableAttributeValueMapper::create()->map($akeneoAttributeValues);
         self::assertTrue($actual->equals($expected));
     }
 

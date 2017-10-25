@@ -10,20 +10,12 @@ use SnowIO\AkeneoDataModel\AttributeValueSet as AkeneoAttributeValueSet;
 
 class SimpleAttributeValueMapperTest extends TestCase
 {
-    /** @var  SimpleAttributeValueMapper */
-    private $simpleAttributeValueMapper;
-
-    public function setUp()
-    {
-        $this->simpleAttributeValueMapper = SimpleAttributeValueMapper::create();
-    }
-
     /**
      * @dataProvider mapDataProvider
      */
     public function testMap(AkeneoAttributeValueSet $akeneoAttributeValues, FredhopperAttributeValueSet $expected)
     {
-        $actual = $this->simpleAttributeValueMapper->map($akeneoAttributeValues);
+        $actual = SimpleAttributeValueMapper::create()->map($akeneoAttributeValues);
         self::assertTrue($actual->equals($expected));
     }
 

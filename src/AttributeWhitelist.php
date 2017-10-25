@@ -1,7 +1,7 @@
 <?php
 namespace SnowIO\AkeneoFredhopper;
 
-use SnowIO\AkeneoDataModel\Attribute;
+use SnowIO\AkeneoDataModel\AttributeData;
 use SnowIO\AkeneoDataModel\AttributeValue;
 
 final class AttributeWhitelist
@@ -21,8 +21,8 @@ final class AttributeWhitelist
 
     public function getAttributeFilter(): callable
     {
-        return function (Attribute $akeneoAttribute): bool {
-            $attributeCode = $akeneoAttribute->getCode();
+        return function (AttributeData $akeneoAttributeData): bool {
+            $attributeCode = $akeneoAttributeData->getCode();
             return isset($this->attributeCodes[$attributeCode]);
         };
     }

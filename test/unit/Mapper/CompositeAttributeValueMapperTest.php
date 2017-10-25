@@ -8,15 +8,6 @@ use SnowIO\FredhopperDataModel\AttributeValueSet as FredhopperAttributeValueSet;
 
 class CompositeAttributeValueMapperTest extends TestCase
 {
-
-    /** @var CompositeAttributeValueMapper */
-    private $compositeAttributeValueMapper;
-
-    public function setUp()
-    {
-        $this->compositeAttributeValueMapper = CompositeAttributeValueMapper::create();
-    }
-
     /**
      * @dataProvider mapDataProvider
      */
@@ -25,14 +16,11 @@ class CompositeAttributeValueMapperTest extends TestCase
         FredhopperAttributeValueSet $expected,
         array $mappers
     ) {
+        $compositeAttributeValueMapper = CompositeAttributeValueMapper::create();
         foreach ($mappers as $mapper) {
-            $this->compositeAttributeValueMapper = $this->compositeAttributeValueMapper
-                ->with($mapper);
+            $compositeAttributeValueMapper = $compositeAttributeValueMapper->with($mapper);
         }
-
-        $actual = $this->compositeAttributeValueMapper
-            ->map($akeneoAttributeValues);
-
+        $actual = $compositeAttributeValueMapper->map($akeneoAttributeValues);
         self::assertTrue($expected->equals($actual));
     }
 
