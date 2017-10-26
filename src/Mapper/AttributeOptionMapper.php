@@ -12,17 +12,7 @@ class AttributeOptionMapper
 {
     public static function create(): self
     {
-        $attributeOptionMapper = new self;
-        $attributeOptionMapper->attributeIdMapper = function (string $code) { return $code; };
-        $attributeOptionMapper->displayValueMapper = function (AkeneoInternationalizedString $labels) {
-            $result = FredhopperInternationalizedString::create();
-            /** @var LocalizedString $label */
-            foreach ($labels as $label) {
-                $result = $result->withValue($label->getValue(), $label->getLocale());
-            }
-            return $result;
-        };
-        return $attributeOptionMapper;
+        return new self;
     }
 
     public function map(AkeneoAttributeOption $attributeOption): FredhopperAttributeOption
@@ -52,5 +42,14 @@ class AttributeOptionMapper
 
     private function __construct()
     {
+        $this->attributeIdMapper = function (string $code) { return $code; };
+        $this->displayValueMapper = function (AkeneoInternationalizedString $labels) {
+            $result = FredhopperInternationalizedString::create();
+            /** @var LocalizedString $label */
+            foreach ($labels as $label) {
+                $result = $result->withValue($label->getValue(), $label->getLocale());
+            }
+            return $result;
+        };
     }
 }

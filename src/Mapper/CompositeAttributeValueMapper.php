@@ -7,7 +7,7 @@ use SnowIO\FredhopperDataModel\AttributeValueSet as FredhopperAttributeValueSet;
 
 class CompositeAttributeValueMapper implements AttributeValueMapper
 {
-    public static function create()
+    public static function create(): self
     {
         return new self;
     }

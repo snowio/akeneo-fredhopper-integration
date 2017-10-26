@@ -10,13 +10,7 @@ class ProductToProductMapper
 {
     public static function create(): self
     {
-        $standaloneProductMapper = new self;
-        $standaloneProductMapper->categoryIdMapper = function ($categoryCode) { return $categoryCode; };
-        $standaloneProductMapper->productIdMapper = function (string $channel, string $sku) {
-            return $sku;
-        };
-        $standaloneProductMapper->attributeValueMapper = SimpleAttributeValueMapper::create();
-        return $standaloneProductMapper;
+        return new self;
     }
 
     public function map(AkeneoProductData $akeneoProductData): FredhopperProductData
@@ -59,15 +53,17 @@ class ProductToProductMapper
 
     /** @var callable */
     private $categoryIdMapper;
-
     /** @var callable */
     private $productIdMapper;
-
     /** @var SimpleAttributeValueMapper */
     private $attributeValueMapper;
 
     private function __construct()
     {
-
+        $this->categoryIdMapper = function ($categoryCode) { return $categoryCode; };
+        $this->productIdMapper = function (string $channel, string $sku) {
+            return $sku;
+        };
+        $this->attributeValueMapper = SimpleAttributeValueMapper::create();
     }
 }

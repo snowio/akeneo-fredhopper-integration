@@ -9,13 +9,7 @@ class VariantGroupToProductMapper
 {
     public static function create(): self
     {
-        $productMapper = new self;
-        $productMapper->categoryIdMapper = function ($categoryCode) { return $categoryCode; };
-        $productMapper->productIdMapper = function (string $channel, string $variantGroupCode) {
-            return $variantGroupCode;
-        };
-        $productMapper->attributeValueMapper = SimpleAttributeValueMapper::create();
-        return $productMapper;
+        return new self;
     }
 
     public function map(VariantGroupData $variantGroup): FredhopperProductData
@@ -41,16 +35,15 @@ class VariantGroupToProductMapper
     }
 
     /** @var callable */
-    private $categoryIdMapper;
-
-    /** @var callable */
     private $productIdMapper;
-
     /** @var SimpleAttributeValueMapper */
     private $attributeValueMapper;
 
     private function __construct()
     {
-
+        $this->productIdMapper = function (string $channel, string $variantGroupCode) {
+            return $variantGroupCode;
+        };
+        $this->attributeValueMapper = SimpleAttributeValueMapper::create();
     }
 }

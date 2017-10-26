@@ -16,14 +16,6 @@ class PriceAttributeMapper implements AttributeMapper
     {
         $mapper = new self;
         $mapper->currencies = $currencies;
-        $mapper->nameMapper = function (AkeneoInternationalizedString $labels) {
-            $result = FredhopperInternationalizedString::create();
-            /** @var LocalizedString $label */
-            foreach ($labels as $label) {
-                $result = $result->withValue($label->getValue(), $label->getLocale());
-            }
-            return $result;
-        };
         return $mapper;
     }
 
@@ -58,6 +50,13 @@ class PriceAttributeMapper implements AttributeMapper
 
     private function __construct()
     {
-
+        $this->nameMapper = function (AkeneoInternationalizedString $labels) {
+            $result = FredhopperInternationalizedString::create();
+            /** @var LocalizedString $label */
+            foreach ($labels as $label) {
+                $result = $result->withValue($label->getValue(), $label->getLocale());
+            }
+            return $result;
+        };
     }
 }

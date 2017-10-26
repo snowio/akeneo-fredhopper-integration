@@ -9,18 +9,7 @@ class ProductToVariantMapper
 {
     public static function create(): self
     {
-        $variantMapper = new self;
-        $variantMapper->skuToProductIdMapper = function (string $channel, string $sku) {
-            return $sku;
-        };
-        $variantMapper->variantGroupCodeToProductIdMapper = function (string $channel, string $code) {
-            return $code;
-        };
-        $variantMapper->variantIdMapper = function (string $channel, string $sku) {
-            return "v_{$sku}";
-        };
-        $variantMapper->attributeValueMapper = SimpleAttributeValueMapper::create();
-        return $variantMapper;
+        return new self;
     }
 
     public function map(AkeneoProductData $akeneoProductData): ?FredhopperVariantData
@@ -81,6 +70,15 @@ class ProductToVariantMapper
 
     private function __construct()
     {
-
+        $this->skuToProductIdMapper = function (string $channel, string $sku) {
+            return $sku;
+        };
+        $this->variantGroupCodeToProductIdMapper = function (string $channel, string $code) {
+            return $code;
+        };
+        $this->variantIdMapper = function (string $channel, string $sku) {
+            return "v_{$sku}";
+        };
+        $this->attributeValueMapper = SimpleAttributeValueMapper::create();
     }
 }

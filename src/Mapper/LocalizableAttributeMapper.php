@@ -12,17 +12,7 @@ class LocalizableAttributeMapper implements AttributeMapper
 {
     public static function create(): self
     {
-        $mapper = new self;
-        $mapper->typeMapper = StandardAttributeMapper::getDefaultTypeMapper();
-        $mapper->nameMapper = function (AkeneoInternationalizedString $labels) {
-            $result = FredhopperInternationalizedString::create();
-            /** @var LocalizedString $label */
-            foreach ($labels as $label) {
-                $result = $result->withValue($label->getValue(), $label->getLocale());
-            }
-            return $result;
-        };
-        return $mapper;
+        return new self;
     }
 
     public static function of(array $locales): self
@@ -65,6 +55,14 @@ class LocalizableAttributeMapper implements AttributeMapper
 
     private function __construct()
     {
-
+        $this->typeMapper = StandardAttributeMapper::getDefaultTypeMapper();
+        $this->nameMapper = function (AkeneoInternationalizedString $labels) {
+            $result = FredhopperInternationalizedString::create();
+            /** @var LocalizedString $label */
+            foreach ($labels as $label) {
+                $result = $result->withValue($label->getValue(), $label->getLocale());
+            }
+            return $result;
+        };
     }
 }

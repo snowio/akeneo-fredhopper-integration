@@ -14,20 +14,7 @@ class StandardAttributeMapper implements AttributeMapper
 {
     public static function create(): self
     {
-        $mapper = new self;
-        $mapper->typeMapper = self::getDefaultTypeMapper();
-        $mapper->attributeIdMapper = function (string $code) {
-            return $code;
-        };
-        $mapper->nameMapper = function (AkeneoInternationalizedString $labels) {
-            $result = FredhopperInternationalizedString::create();
-            /** @var LocalizedString $label */
-            foreach ($labels as $label) {
-                $result = $result->withValue($label->getValue(), $label->getLocale());
-            }
-            return $result;
-        };
-        return $mapper;
+        return new self;
     }
 
     public function map(AkeneoAttributeData $akeneoAttributeData): array
@@ -82,6 +69,17 @@ class StandardAttributeMapper implements AttributeMapper
 
     private function __construct()
     {
-
+        $this->typeMapper = self::getDefaultTypeMapper();
+        $this->attributeIdMapper = function (string $code) {
+            return $code;
+        };
+        $this->nameMapper = function (AkeneoInternationalizedString $labels) {
+            $result = FredhopperInternationalizedString::create();
+            /** @var LocalizedString $label */
+            foreach ($labels as $label) {
+                $result = $result->withValue($label->getValue(), $label->getLocale());
+            }
+            return $result;
+        };
     }
 }

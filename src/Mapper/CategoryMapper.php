@@ -12,17 +12,7 @@ class CategoryMapper
 {
     public static function create(): self
     {
-        $mapper = new self;
-        $mapper->categoryIdMapper = function (string $categoryCode) { return $categoryCode; };
-        $mapper->nameMapper = function (AkeneoInternationalizedString $labels) {
-            $result = FredhopperInternationalizedString::create();
-            /** @var LocalizedString $label */
-            foreach ($labels as $label) {
-                $result = $result->withValue($label->getValue(), $label->getLocale());
-            }
-            return $result;
-        };
-        return $mapper;
+        return new self;
     }
 
     public function map(AkeneoCategoryData $akeneoCategory): FredhopperCategoryData
@@ -53,12 +43,19 @@ class CategoryMapper
 
     /** @var callable */
     private $categoryIdMapper;
-
     /** @var callable */
     private $nameMapper;
 
     private function __construct()
     {
-
+        $this->categoryIdMapper = function (string $categoryCode) { return $categoryCode; };
+        $this->nameMapper = function (AkeneoInternationalizedString $labels) {
+            $result = FredhopperInternationalizedString::create();
+            /** @var LocalizedString $label */
+            foreach ($labels as $label) {
+                $result = $result->withValue($label->getValue(), $label->getLocale());
+            }
+            return $result;
+        };
     }
 }
