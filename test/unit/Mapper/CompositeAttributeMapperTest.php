@@ -3,10 +3,10 @@ declare(strict_types=1);
 namespace SnowIO\AkeneoFredhopper\Mapper;
 
 use PHPUnit\Framework\TestCase;
-use SnowIO\AkeneoDataModel\AttributeData as AkeneoAttribute;
+use SnowIO\AkeneoDataModel\AttributeData as AkeneoAttributeData;
 use SnowIO\AkeneoDataModel\AttributeType as AkeneoAttributeType;
 use SnowIO\FredhopperDataModel\AttributeType as FredhopperAttributeType;
-use SnowIO\FredhopperDataModel\AttributeData as FredhopperAttribute;
+use SnowIO\FredhopperDataModel\AttributeData as FredhopperAttributeData;
 use SnowIO\FredhopperDataModel\InternationalizedString;
 
 class CompositeAttributeMapperTest extends TestCase
@@ -14,24 +14,36 @@ class CompositeAttributeMapperTest extends TestCase
     /**
      * @dataProvider mapDataProvider
      */
-    public function testMap(AkeneoAttribute $akeneoAttribute, array $expected, array $mappers = [])
+    public function testMap(CompositeAttributeMapper $mapper, AkeneoAttributeData $input, array $expectedOutput)
     {
-        $compositeAttributeMapper = CompositeAttributeMapper::create();
-        foreach ($mappers as $mapper) {
-            $compositeAttributeMapper = $compositeAttributeMapper->with($mapper);
-        }
-        $actual = $compositeAttributeMapper->map($akeneoAttribute);
-        $renderJson = function (FredhopperAttribute $attribute) {
+        $actualOutput = $mapper->map($input);
+        $renderJson = function (FredhopperAttributeData $attribute) {
             return $attribute->toJson();
         };
-        self::assertEquals(\array_map($renderJson, $expected),\array_map($renderJson, $actual));
+        self::assertEquals(\array_map($renderJson, $expectedOutput), \array_map($renderJson, $actualOutput));
     }
 
     public function mapDataProvider()
     {
         return  [
             'test-multiple-mappers-on-attribute' => [
-                AkeneoAttribute::fromJson([
+                CompositeAttributeMapper::create()
+                    ->with(
+                        StandardAttributeMapper::create()->withAttributeIdMapper(function (string $attributeId) {
+                            return $attributeId . '_mapper_modified_1';
+                        })
+                    )
+                    ->with(
+                        StandardAttributeMapper::create()->withAttributeIdMapper(function (string $attributeId) {
+                            return $attributeId . '_mapper_modified_2';
+                        })
+                    )
+                    ->with(
+                        StandardAttributeMapper::create()->withAttributeIdMapper(function (string $attributeId) {
+                            return $attributeId . '_mapper_modified_3';
+                        })
+                    ),
+                AkeneoAttributeData::fromJson([
                     'code' => 'size',
                     'type' => AkeneoAttributeType::IDENTIFIER,
                     'localizable' => false,
@@ -45,21 +57,21 @@ class CompositeAttributeMapperTest extends TestCase
                     '@timestamp' => 1508491122,
                 ]),
                 [
-                    FredhopperAttribute::of(
+                    FredhopperAttributeData::of(
                         'size_mapper_modified_1',
                         FredhopperAttributeType::TEXT,
                         InternationalizedString::create()
                             ->withValue('Size', 'en_GB')
                             ->withValue('Größe', 'de_DE')
                     ),
-                    FredhopperAttribute::of(
+                    FredhopperAttributeData::of(
                         'size_mapper_modified_2',
                         FredhopperAttributeType::TEXT,
                         InternationalizedString::create()
                             ->withValue('Size', 'en_GB')
                             ->withValue('Größe', 'de_DE')
                     ),
-                    FredhopperAttribute::of(
+                    FredhopperAttributeData::of(
                         'size_mapper_modified_3',
                         FredhopperAttributeType::TEXT,
                         InternationalizedString::create()
@@ -67,20 +79,6 @@ class CompositeAttributeMapperTest extends TestCase
                             ->withValue('Größe', 'de_DE')
                     ),
                 ],
-                [
-                    StandardAttributeMapper::create()
-                        ->withAttributeIdMapper(function (string $attributeId) {
-                            return $attributeId . '_mapper_modified_1';
-                        }),
-                    StandardAttributeMapper::create()
-                        ->withAttributeIdMapper(function (string $attributeId) {
-                            return $attributeId . '_mapper_modified_2';
-                        }),
-                    StandardAttributeMapper::create()
-                        ->withAttributeIdMapper(function (string $attributeId) {
-                            return $attributeId . '_mapper_modified_3';
-                        })
-                ]
             ]
         ];
     }

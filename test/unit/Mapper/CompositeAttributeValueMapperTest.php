@@ -13,22 +13,20 @@ class CompositeAttributeValueMapperTest extends TestCase
      * @dataProvider mapDataProvider
      */
     public function testMap(
-        AkeneoAttributeValueSet $akeneoAttributeValues,
-        FredhopperAttributeValueSet $expected,
-        array $mappers
+        CompositeAttributeValueMapper $mapper,
+        AkeneoAttributeValueSet $input,
+        FredhopperAttributeValueSet $expectedOutput
     ) {
-        $compositeAttributeValueMapper = CompositeAttributeValueMapper::create();
-        foreach ($mappers as $mapper) {
-            $compositeAttributeValueMapper = $compositeAttributeValueMapper->with($mapper);
-        }
-        $actual = $compositeAttributeValueMapper->map($akeneoAttributeValues);
-        self::assertTrue($expected->equals($actual));
+        $actualOutput = $mapper->map($input);
+        self::assertTrue($actualOutput->equals($expectedOutput));
     }
 
     public function mapDataProvider()
     {
         return [
             'with-simple-attribute-value-mappers' => [
+                CompositeAttributeValueMapper::create()
+                    ->with(SimpleAttributeValueMapper::create()),
                 AkeneoAttributeValueSet::fromJson('main', [
                     'attribute_values' => [
                         'size' => 'Large',
@@ -43,9 +41,6 @@ class CompositeAttributeValueMapperTest extends TestCase
                     FredhopperAttributeValue::of('size', 'Large'),
                     FredhopperAttributeValue::of('weight', '30'),
                 ]),
-                [
-                    SimpleAttributeValueMapper::create(),
-                ],
             ],
         ];
     }

@@ -10,34 +10,28 @@ use SnowIO\FredhopperDataModel\AttributeValueSet as FredhopperAttributeValueSet;
 
 class AttributeValueMapperWithFilterTest extends TestCase
 {
-    /** @var AttributeValueMapperWithFilter  */
-    private $filterableAttributeValueMapper;
-
-    public function setUp()
-    {
-        $this->filterableAttributeValueMapper = AttributeValueMapperWithFilter::of(
-            SimpleAttributeValueMapper::create(),
-            function (AkeneoAttributeValue $akeneoAttributeValue) {
-                return $akeneoAttributeValue->getAttributeCode() === 'size';
-            }
-        );
-    }
-
     /**
      * @dataProvider mapDataProvider
      */
     public function testMap(
+        AttributeValueMapper $mapper,
         AkeneoAttributeValueSet $akeneoAttributeValues,
-        FredhopperAttributeValueSet $expected
+        FredhopperAttributeValueSet $expectedOutput
     ) {
-        $actual = $this->filterableAttributeValueMapper->map($akeneoAttributeValues);
-        self::assertTrue($expected->equals($actual));
+        $actualOutput = $mapper->map($akeneoAttributeValues);
+        self::assertTrue($actualOutput->equals($expectedOutput));
     }
 
     public function mapDataProvider()
     {
         return [
             'filterSize' => [
+                AttributeValueMapperWithFilter::of(
+                    SimpleAttributeValueMapper::create(),
+                    function (AkeneoAttributeValue $akeneoAttributeValue) {
+                        return $akeneoAttributeValue->getAttributeCode() === 'size';
+                    }
+                ),
                 AkeneoAttributeValueSet::fromJson('main', [
                     'attribute_values' => [
                         'size' => 'large',
@@ -53,6 +47,12 @@ class AttributeValueMapperWithFilterTest extends TestCase
                 ]),
             ],
             'filterSizeWillReturnEmptyAttributeValueSet' => [
+                AttributeValueMapperWithFilter::of(
+                    SimpleAttributeValueMapper::create(),
+                    function (AkeneoAttributeValue $akeneoAttributeValue) {
+                        return $akeneoAttributeValue->getAttributeCode() === 'size';
+                    }
+                ),
                 AkeneoAttributeValueSet::fromJson('main', [
                     'attribute_values' => [
                         'price' => [

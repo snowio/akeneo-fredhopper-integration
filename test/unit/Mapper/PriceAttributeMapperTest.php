@@ -14,20 +14,19 @@ class PriceAttributeMapperTest extends TestCase
     /**
      * @dataProvider mapDataProvider
      */
-    public function testMap(array $currencies, AkeneoAttribute $akeneoAttribute, array $expected)
+    public function testMap(PriceAttributeMapper $mapper, AkeneoAttribute $input, array $expectedOutput)
     {
-        $priceAttributeMapper = PriceAttributeMapper::of($currencies);
-        $actual = $priceAttributeMapper->map($akeneoAttribute);
-        self::assertEquals($this->getJson($expected), $this->getJson($actual));
+        $actualOutput = $mapper->map($input);
+        self::assertEquals($this->getJson($expectedOutput), $this->getJson($actualOutput));
     }
 
     /**
      * @dataProvider invalidMapDataProvider
-     * @expectedException \Error
+     * @expectedException \Exception
      */
-    public function testMapWithNonPriceType(array $currencies, AkeneoAttribute $akeneoAttribute, array $expected)
+    public function testMapWithNonPriceType(PriceAttributeMapper $mapper, AkeneoAttribute $input)
     {
-        $this->testMap($currencies, $akeneoAttribute, $expected);
+        $mapper->map($input);
     }
 
     public function getJson(array $expectedFredhopperAttributes)
@@ -41,10 +40,10 @@ class PriceAttributeMapperTest extends TestCase
     {
         return [
             'test-with-price-type' => [
-                [
+                PriceAttributeMapper::of([
                     'gbp',
                     'eur',
-                ],
+                ]),
                 AkeneoAttribute::fromJson([
                     'code' => 'price',
                     'type' => AkeneoAttributeType::PRICE_COLLECTION,
@@ -71,7 +70,7 @@ class PriceAttributeMapperTest extends TestCase
                 ],
             ],
             'without-currencies' => [
-                [],
+                PriceAttributeMapper::of([]),
                 AkeneoAttribute::fromJson([
                     'code' => 'price',
                     'type' => AkeneoAttributeType::PRICE_COLLECTION,
@@ -95,10 +94,10 @@ class PriceAttributeMapperTest extends TestCase
     {
         return [
             'test-with-non-price-type' => [
-                [
+                PriceAttributeMapper::of([
                     'gbp',
                     'eur',
-                ],
+                ]),
                 AkeneoAttribute::fromJson([
                     'code' => 'size',
                     'type' => AkeneoAttributeType::SIMPLESELECT,
@@ -112,15 +111,6 @@ class PriceAttributeMapperTest extends TestCase
                     'group' => 'general',
                     '@timestamp' => 1508491122,
                 ]),
-                [
-                    FredhopperAttribute::of(
-                        'size',
-                        FredhopperAttributeType::LIST,
-                        InternationalizedString::create()
-                            ->withValue('Size', 'en_GB')
-                            ->withValue('Taille', 'fr_FR')
-                    ),
-                ],
             ],
         ];
     }

@@ -6,7 +6,7 @@ use PHPUnit\Framework\TestCase;
 use SnowIO\AkeneoDataModel\ProductData as AkeneoProductData;
 use SnowIO\FredhopperDataModel\AttributeValue;
 use SnowIO\FredhopperDataModel\CategoryIdSet;
-use SnowIO\FredhopperDataModel\ProductData as FredhopperProduct;
+use SnowIO\FredhopperDataModel\ProductData as FredhopperProductData;
 
 class ProductToProductMapperTest extends TestCase
 {
@@ -14,32 +14,19 @@ class ProductToProductMapperTest extends TestCase
      * @dataProvider mapDataProvider
      */
     public function testMap(
-        AkeneoProductData $akeneoProductData,
-        FredhopperProduct $expected,
-        callable $categoryIdMapper = null,
-        callable $productIdMapper = null,
-        $attributeValueMapper = null
+        ProductToProductMapper $mapper,
+        AkeneoProductData $input,
+        FredhopperProductData $expectedOutput
     ) {
-        $productToProductMapper = ProductToProductMapper::create();
-
-        if (null !== $categoryIdMapper) {
-            $productToProductMapper = $productToProductMapper->withCategoryIdMapper($categoryIdMapper);
-        }
-        if (null !== $productIdMapper) {
-            $productToProductMapper = $productToProductMapper->withProductIdMapper($productIdMapper);
-        }
-        if (null !== $attributeValueMapper) {
-            $productToProductMapper = $productToProductMapper->withAttributeValueMapper($attributeValueMapper);
-        }
-
-        $actual = $productToProductMapper->map($akeneoProductData);
-        self::assertTrue($actual->equals($expected));
+        $actualOutput = $mapper->map($input);
+        self::assertTrue($actualOutput->equals($expectedOutput));
     }
 
     public function mapDataProvider()
     {
         return [
             'testWithDefaultMappers' => [
+                ProductToProductMapper::create(),
                 AkeneoProductData::fromJson([
                     'sku' => 'abc123',
                     'channel' => 'main',
@@ -55,14 +42,18 @@ class ProductToProductMapperTest extends TestCase
                     'enabled' => true,
                     '@timestamp' => 1508491122,
                 ]),
-                FredhopperProduct::of('abc123')
+                FredhopperProductData::of('abc123')
                     ->withCategoryIds(CategoryIdSet::of(['t_shirts', 'trousers']))
                     ->withAttributeValue(AttributeValue::of('size', 'Large')),
-                null,
-                null,
-                null,
             ],
             'testWithCustomMappers' => [
+                ProductToProductMapper::create()
+                    ->withCategoryIdMapper(function (string $categoryId) {
+                        return $categoryId . '_mapped';
+                    })
+                    ->withProductIdMapper(function (string $channel, string $sku) {
+                        return $sku . '_mapped';
+                    }),
                 AkeneoProductData::fromJson([
                     'sku' => 'abc123',
                     'channel' => 'main',
@@ -78,17 +69,9 @@ class ProductToProductMapperTest extends TestCase
                     'enabled' => true,
                     '@timestamp' => 1508491122,
                 ]),
-                FredhopperProduct::of('abc123_mapped')
+                FredhopperProductData::of('abc123_mapped')
                     ->withCategoryIds(CategoryIdSet::of(['t_shirts_mapped', 'trousers_mapped']))
-                    ->withAttributeValue(AttributeValue::of('size', 'Large'))
-                ,
-                function (string $categoryId) {
-                    return $categoryId . '_mapped';
-                },
-                function (string $channel, string $sku) {
-                    return $sku . '_mapped';
-                },
-                SimpleAttributeValueMapper::create(),
+                    ->withAttributeValue(AttributeValue::of('size', 'Large')),
             ],
         ];
     }

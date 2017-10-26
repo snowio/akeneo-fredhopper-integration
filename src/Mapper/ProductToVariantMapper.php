@@ -49,7 +49,7 @@ class ProductToVariantMapper
     public function withVariantGroupCodeToProductIdMapper(callable $fn): self
     {
         $result = clone $this;
-        $result->skuToProductIdMapper = $fn;
+        $result->variantGroupCodeToProductIdMapper = $fn;
         return $result;
     }
 

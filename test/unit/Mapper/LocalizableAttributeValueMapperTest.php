@@ -12,10 +12,10 @@ class LocalizableAttributeValueMapperTest extends TestCase
     /**
      * @dataProvider mapDataProvider
      */
-    public function testMap(AkeneoAttributeValueSet $akeneoAttributeValues, FredhopperAttributeValueSet $expected)
+    public function testMap(AkeneoAttributeValueSet $input, FredhopperAttributeValueSet $expectedOutput)
     {
-        $actual = LocalizableAttributeValueMapper::create()->map($akeneoAttributeValues);
-        self::assertTrue($actual->equals($expected));
+        $actualOutput = LocalizableAttributeValueMapper::create()->map($input);
+        self::assertTrue($actualOutput->equals($expectedOutput));
     }
 
     public function mapDataProvider()

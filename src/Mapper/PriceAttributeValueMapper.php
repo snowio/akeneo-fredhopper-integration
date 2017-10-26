@@ -36,4 +36,9 @@ class PriceAttributeValueMapper implements AttributeValueMapper
         }
         return FredhopperAttributeValueSet::of($fredhopperPriceAttributeValues);
     }
+
+    private function __construct()
+    {
+
+    }
 }

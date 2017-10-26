@@ -17,35 +17,30 @@ class AttributeOptionMapperTest extends TestCase
      * @dataProvider mapDataProvider
      */
     public function testMap(
+        AttributeOptionMapper $mapper,
         AkeneoAttributeOption $input,
-        FredhopperAttributeOption $expected,
-        callable $attributeIdMapper = null,
-        callable $displayValueMapper = null
+        FredhopperAttributeOption $expectedOutput
     ) {
-        $attributeOptionMapper = AttributeOptionMapper::create();
-
-        if ($attributeIdMapper !== null) {
-            $attributeOptionMapper = $attributeOptionMapper->withAttributeIdMapper($attributeIdMapper);
-        }
-
-        if ($displayValueMapper !== null) {
-            $attributeOptionMapper = $attributeOptionMapper->withDisplayValueMapper($displayValueMapper);
-        }
-
-        $actual = $attributeOptionMapper->map($input);
-        self::assertTrue($expected->equals($actual));
+        $actualOutput = $mapper->map($input);
+        self::assertTrue($actualOutput->equals($expectedOutput));
     }
 
     public function mapDataProvider()
     {
         return [
             'noLabels' => [
+                AttributeOptionMapper::create(),
                 AkeneoAttributeOption::of(AttributeOptionIdentifier::of('size', 'large')),
                 FredhopperAttributeOption::of('size', 'large'),
-                null,
-                null,
             ],
             'labels' => [
+                AttributeOptionMapper::create()
+                    ->withDisplayValueMapper(function (AkeneoInternationalizedString $optionLabels) {
+                        return FredhopperInternationalizedString::create()
+                            ->withValue($optionLabels->getValue('en_GB'), 'en_GB')
+                            ->withValue($optionLabels->getValue('de_DE'), 'de_DE')
+                            ->withValue($optionLabels->getValue('eu_FR'), 'fr_FR');
+                    }),
                 AkeneoAttributeOption::of(AttributeOptionIdentifier::of('size', 'large'))
                     ->withLabel(AkeneoLocalizedString::of('Groß', 'de_DE'))
                     ->withLabel(AkeneoLocalizedString::of('Grand', 'eu_FR'))
@@ -54,15 +49,18 @@ class AttributeOptionMapperTest extends TestCase
                     ->withDisplayValue(FredhopperLocalizedString::of('Groß', 'de_DE'))
                     ->withDisplayValue(FredhopperLocalizedString::of('Grand', 'fr_FR'))
                     ->withDisplayValue(FredhopperLocalizedString::of('Large', 'en_GB')),
-                null,
-                function (AkeneoInternationalizedString $optionLabels) {
-                    return FredhopperInternationalizedString::create()
-                        ->withValue($optionLabels->getValue('en_GB'), 'en_GB')
-                        ->withValue($optionLabels->getValue('de_DE'), 'de_DE')
-                        ->withValue($optionLabels->getValue('eu_FR'), 'fr_FR');
-                },
             ],
             'noLabelsWithAttributeIdMapper' => [
+                AttributeOptionMapper::create()
+                    ->withAttributeIdMapper(function (string $attributeCode) {
+                        return $attributeCode . '_modified';
+                    })
+                    ->withDisplayValueMapper(function (AkeneoInternationalizedString $optionLabels) {
+                        return FredhopperInternationalizedString::create()
+                            ->withValue($optionLabels->getValue('en_GB'), 'en_GB')
+                            ->withValue($optionLabels->getValue('de_DE'), 'de_DE')
+                            ->withValue($optionLabels->getValue('eu_FR'), 'fr_FR');
+                    }),
                 AkeneoAttributeOption::of(AttributeOptionIdentifier::of('size', 'large'))
                     ->withLabel(AkeneoLocalizedString::of('Groß', 'de_DE'))
                     ->withLabel(AkeneoLocalizedString::of('Grand', 'eu_FR'))
@@ -71,17 +69,14 @@ class AttributeOptionMapperTest extends TestCase
                     ->withDisplayValue(FredhopperLocalizedString::of('Groß', 'de_DE'))
                     ->withDisplayValue(FredhopperLocalizedString::of('Grand', 'fr_FR'))
                     ->withDisplayValue(FredhopperLocalizedString::of('Large', 'en_GB')),
-                function (string $attributeCode) {
-                    return $attributeCode . '_modified';
-                },
-                function (AkeneoInternationalizedString $optionLabels) {
-                    return FredhopperInternationalizedString::create()
-                        ->withValue($optionLabels->getValue('en_GB'), 'en_GB')
-                        ->withValue($optionLabels->getValue('de_DE'), 'de_DE')
-                        ->withValue($optionLabels->getValue('eu_FR'), 'fr_FR');
-                },
             ],
             'labelsWithDisplayValueMapper' => [
+                AttributeOptionMapper::create()
+                    ->withDisplayValueMapper(function (AkeneoInternationalizedString $optionLabels) {
+                        return FredhopperInternationalizedString::create()
+                            ->withValue($optionLabels->getValue('en_GB'), 'en_GB')
+                            ->withValue($optionLabels->getValue('de_DE'), 'de_DE');
+                    }),
                 AkeneoAttributeOption::of(AttributeOptionIdentifier::of('size', 'large'))
                     ->withLabel(AkeneoLocalizedString::of('Groß', 'de_DE'))
                     ->withLabel(AkeneoLocalizedString::of('Grand', 'eu_FR'))
@@ -89,12 +84,6 @@ class AttributeOptionMapperTest extends TestCase
                 FredhopperAttributeOption::of('size', 'large')
                     ->withDisplayValue(FredhopperLocalizedString::of('Groß', 'de_DE'))
                     ->withDisplayValue(FredhopperLocalizedString::of('Large', 'en_GB')),
-                null,
-                function (AkeneoInternationalizedString $optionLabels) {
-                    return FredhopperInternationalizedString::create()
-                        ->withValue($optionLabels->getValue('en_GB'), 'en_GB')
-                        ->withValue($optionLabels->getValue('de_DE'), 'de_DE');
-                },
             ],
 
         ];

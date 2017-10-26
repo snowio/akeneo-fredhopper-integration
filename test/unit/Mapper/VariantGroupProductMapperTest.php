@@ -3,9 +3,11 @@ declare(strict_types=1);
 namespace SnowIO\AkeneoFredhopper\Mapper;
 
 use PHPUnit\Framework\TestCase;
+use SnowIO\AkeneoDataModel\AttributeValueSet as AkeneoAttributeValueSet;
 use SnowIO\AkeneoDataModel\VariantGroupData;
 use SnowIO\FredhopperDataModel\AttributeValue as FredhopperAttributeValue;
-use SnowIO\FredhopperDataModel\ProductData as FredhopperProduct;
+use SnowIO\FredhopperDataModel\AttributeValueSet as FredhopperAttributeValueSet;
+use SnowIO\FredhopperDataModel\ProductData as FredhopperProductData;
 
 class VariantGroupProductMapperTest extends TestCase
 {
@@ -13,28 +15,28 @@ class VariantGroupProductMapperTest extends TestCase
      * @dataProvider mapDataProvider
      */
     public function testMap(
-        VariantGroupData $akeneoVariantGroup,
-        FredhopperProduct $expected,
-        callable $productIdMapper = null,
-        $attributeValueMapper = null
+        VariantGroupToProductMapper $mapper,
+        VariantGroupData $input,
+        FredhopperProductData $expectedOutput
     ) {
-        $variantGroupToProductMapper = VariantGroupToProductMapper::create();
-
-        if ($productIdMapper !== null) {
-            $variantGroupToProductMapper = $variantGroupToProductMapper->withProductIdMapper($productIdMapper);
-        }
-        if ($attributeValueMapper !== null) {
-            $variantGroupToProductMapper = $variantGroupToProductMapper->withAttributeValueMapper($attributeValueMapper);
-        }
-
-        $actual = $variantGroupToProductMapper->map($akeneoVariantGroup);
-        self::assertTrue($actual->equals($expected));
+        $actualOutput = $mapper->map($input);
+        self::assertTrue($actualOutput->equals($expectedOutput));
     }
 
     public function mapDataProvider()
     {
         return [
             'withMappers' => [
+                VariantGroupToProductMapper::create()
+                    ->withProductIdMapper(function (string $channel, string $variantGroupCode) {
+                        return "{$channel}_{$variantGroupCode}";
+                    })
+                    ->withAttributeValueMapper(new class implements AttributeValueMapper {
+                        public function map(AkeneoAttributeValueSet $akeneoAttributeValues): FredhopperAttributeValueSet
+                        {
+                            return FredhopperAttributeValueSet::create()->with(FredhopperAttributeValue::of('foo', 'bar'));
+                        }
+                    }),
                 VariantGroupData::fromJson([
                     'code' => '1001425',
                     'axis' => "size_config",
@@ -42,15 +44,12 @@ class VariantGroupProductMapperTest extends TestCase
                     'attribute_values' => [
                         'color' => 'blue'
                     ],
-                    '@timestamp' => 1508491122,
                 ]),
-                FredhopperProduct::of('1001425_modified')->withAttributeValue(FredhopperAttributeValue::of('color', 'blue')),
-                function (string $code) {
-                    return $code . '_modified';
-                },
-                SimpleAttributeValueMapper::create(),
+                FredhopperProductData::of('demontweeks_1001425')
+                    ->withAttributeValue(FredhopperAttributeValue::of('foo', 'bar')),
             ],
             'withoutMappers' => [
+                VariantGroupToProductMapper::create(),
                 VariantGroupData::fromJson([
                     'code' => '1001425',
                     'axis' => "size_config",
@@ -58,9 +57,9 @@ class VariantGroupProductMapperTest extends TestCase
                     'attribute_values' => [
                         'color' => 'blue'
                     ],
-                    '@timestamp' => 1508491122,
                 ]),
-                FredhopperProduct::of('1001425')->withAttributeValue(FredhopperAttributeValue::of('color', 'blue')),
+                FredhopperProductData::of('1001425')
+                    ->withAttributeValue(FredhopperAttributeValue::of('color', 'blue')),
             ]
         ];
     }

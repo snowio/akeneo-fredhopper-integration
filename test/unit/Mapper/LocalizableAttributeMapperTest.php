@@ -3,10 +3,10 @@ declare(strict_types=1);
 namespace SnowIO\AkeneoFredhopper\Mapper;
 
 use PHPUnit\Framework\TestCase;
-use SnowIO\AkeneoDataModel\AttributeData as AkeneoAttribute;
+use SnowIO\AkeneoDataModel\AttributeData as AkeneoAttributeData;
 use SnowIO\AkeneoDataModel\AttributeType as AkeneoAttributeType;
 use SnowIO\FredhopperDataModel\AttributeType as FredhopperAttributeType;
-use SnowIO\FredhopperDataModel\AttributeData as FredhopperAttribute;
+use SnowIO\FredhopperDataModel\AttributeData as FredhopperAttributeData;
 use SnowIO\FredhopperDataModel\InternationalizedString;
 
 class LocalizableAttributeMapperTest extends TestCase
@@ -14,20 +14,10 @@ class LocalizableAttributeMapperTest extends TestCase
     /**
      * @dataProvider mapDataProvider
      */
-    public function testMap(array $locales, AkeneoAttribute $akeneoAttribute, array $expected, callable $typeMapper = null)
+    public function testMap(LocalizableAttributeMapper $mapper, AkeneoAttributeData $input, array $expectedOutput)
     {
-        if (!empty($locales)) {
-            $mapper = LocalizableAttributeMapper::of($locales);
-        } else {
-            $mapper = LocalizableAttributeMapper::create();
-        }
-
-        if ($typeMapper !== null) {
-            $mapper = $mapper->withTypeMapper($typeMapper);
-        }
-
-        $actual = $mapper->map($akeneoAttribute);
-        self::assertEquals($this->getJson($expected), $this->getJson($actual));
+        $actualOutput = $mapper->map($input);
+        self::assertEquals($this->getJson($expectedOutput), $this->getJson($actualOutput));
     }
 
     /**
@@ -40,7 +30,7 @@ class LocalizableAttributeMapperTest extends TestCase
 
     public function getJson(array $fredhopperAttributes)
     {
-        return array_map(function (FredhopperAttribute $attribute) {
+        return array_map(function (FredhopperAttributeData $attribute) {
             return $attribute->toJson();
         }, $fredhopperAttributes);
     }
@@ -49,11 +39,11 @@ class LocalizableAttributeMapperTest extends TestCase
     {
         return [
             'testWithLocales' => [
-                [
-                    'en_GB',
-                    'fr_FR'
-                ],
-                AkeneoAttribute::fromJson([
+                LocalizableAttributeMapper::of(['en_GB', 'fr_FR'])
+                    ->withTypeMapper(function (string $type) {
+                        return FredhopperAttributeType::LIST;
+                    }),
+                AkeneoAttributeData::fromJson([
                     'code' => 'size',
                     'type' => AkeneoAttributeType::SIMPLESELECT,
                     'localizable' => true,
@@ -67,14 +57,14 @@ class LocalizableAttributeMapperTest extends TestCase
                     '@timestamp' => 1508491122,
                 ]),
                 [
-                    FredhopperAttribute::of(
+                    FredhopperAttributeData::of(
                         'size_en_gb',
                         FredhopperAttributeType::LIST,
                         InternationalizedString::create()
                             ->withValue('Size', 'en_GB')
                             ->withValue('Taille', 'fr_FR')
                     ),
-                    FredhopperAttribute::of(
+                    FredhopperAttributeData::of(
                         'size_fr_fr',
                         FredhopperAttributeType::LIST,
                         InternationalizedString::create()
@@ -82,13 +72,12 @@ class LocalizableAttributeMapperTest extends TestCase
                             ->withValue('Taille', 'fr_FR')
                     ),
                 ],
-                function (string $type) {
-                    return FredhopperAttributeType::LIST;
-                },
             ],
             'testAutomaticLocales' => [
-                [],
-                AkeneoAttribute::fromJson([
+                LocalizableAttributeMapper::create()->withTypeMapper(function (string $type) {
+                    return FredhopperAttributeType::LIST;
+                }),
+                AkeneoAttributeData::fromJson([
                     'code' => 'size',
                     'type' => AkeneoAttributeType::SIMPLESELECT,
                     'localizable' => true,
@@ -102,14 +91,14 @@ class LocalizableAttributeMapperTest extends TestCase
                     '@timestamp' => 1508491122,
                 ]),
                 [
-                    FredhopperAttribute::of(
+                    FredhopperAttributeData::of(
                         'size_en_gb',
                         FredhopperAttributeType::LIST,
                         InternationalizedString::create()
                             ->withValue('Size', 'en_GB')
                             ->withValue('Taille', 'fr_FR')
                     ),
-                    FredhopperAttribute::of(
+                    FredhopperAttributeData::of(
                         'size_fr_fr',
                         FredhopperAttributeType::LIST,
                         InternationalizedString::create()
@@ -117,10 +106,7 @@ class LocalizableAttributeMapperTest extends TestCase
                             ->withValue('Taille', 'fr_FR')
                     ),
                 ],
-                function (string $type) {
-                    return FredhopperAttributeType::LIST;
-                },
-            ]
+            ],
         ];
     }
 

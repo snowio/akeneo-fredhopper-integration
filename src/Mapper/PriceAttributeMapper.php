@@ -29,12 +29,12 @@ class PriceAttributeMapper implements AttributeMapper
 
     /**
      * @return FredhopperAttributeData[]
-     * @throws \Error
+     * @throws \Exception
      */
     public function map(AkeneoAttributeData $akeneoAttributeData): array
     {
         if ($akeneoAttributeData->getType() !== AkeneoAttributeType::PRICE_COLLECTION) {
-            throw new \Error;
+            throw new \Exception;
         }
 
         $attributes = [];
@@ -55,4 +55,9 @@ class PriceAttributeMapper implements AttributeMapper
 
     private $currencies;
     private $nameMapper;
+
+    private function __construct()
+    {
+
+    }
 }

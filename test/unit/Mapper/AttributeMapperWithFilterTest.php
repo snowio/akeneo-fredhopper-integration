@@ -3,39 +3,29 @@ declare(strict_types=1);
 namespace SnowIO\AkeneoFredhopper\Mapper;
 
 use PHPUnit\Framework\TestCase;
-use SnowIO\AkeneoDataModel\AttributeData as AkeneoAttribute;
+use SnowIO\AkeneoDataModel\AttributeData as AkeneoAttributeData;
 use SnowIO\AkeneoDataModel\AttributeType as AkeneoAttributeType;
-use SnowIO\FredhopperDataModel\AttributeData as FredhopperAttribute;
+use SnowIO\FredhopperDataModel\AttributeData as FredhopperAttributeData;
 use SnowIO\FredhopperDataModel\AttributeType as FredhopperAttributeType;
 use SnowIO\FredhopperDataModel\InternationalizedString;
 
 class AttributeMapperWithFilterTest extends TestCase
 {
-    /** @var  AttributeMapperWithFilter */
-    private $filterableAttributeMapper;
-
-    public function setUp()
-    {
-        $this->filterableAttributeMapper = AttributeMapperWithFilter::of(
-            StandardAttributeMapper::create(),
-            function (AkeneoAttribute $attribute) {
-                return $attribute->getCode() === 'size';
-            });
-    }
-
     /**
      * @dataProvider mapDataProvider
      */
-    public function testMap(
-        AkeneoAttribute $akeneoAttribute,
-        array $expected
-    ) {
-        $actual = $this->filterableAttributeMapper
-            ->map($akeneoAttribute);
-        $getJson = function (FredhopperAttribute $fredhopperAttribute) {
+    public function testMap(AkeneoAttributeData $akeneoAttribute, array $expected)
+    {
+        $mapper = AttributeMapperWithFilter::of(
+            StandardAttributeMapper::create(),
+            function (AkeneoAttributeData $akeneoAttributeData) {
+                return $akeneoAttributeData->getCode() === 'size';
+            }
+        );
+        $actual = $mapper->map($akeneoAttribute);
+        $getJson = function (FredhopperAttributeData $fredhopperAttribute) {
             return $fredhopperAttribute->toJson();
         };
-
         self::assertEquals(array_map($getJson, $expected), array_map($getJson, $actual));
     }
 
@@ -43,7 +33,7 @@ class AttributeMapperWithFilterTest extends TestCase
     {
         return [
             'testFilterByAttributeId' => [
-                AkeneoAttribute::fromJson([
+                AkeneoAttributeData::fromJson([
                     'code' => 'size',
                     'type' => AkeneoAttributeType::SIMPLESELECT,
                     'localizable' => false,
@@ -57,7 +47,7 @@ class AttributeMapperWithFilterTest extends TestCase
                     '@timestamp' => 1508491122,
                 ]),
                 [
-                    FredhopperAttribute::of(
+                    FredhopperAttributeData::of(
                         'size',
                         FredhopperAttributeType::LIST,
                         InternationalizedString::create()
@@ -67,7 +57,7 @@ class AttributeMapperWithFilterTest extends TestCase
                 ],
             ],
             'testFilterByAttributeIdReturnsEmptyArray' => [
-                AkeneoAttribute::fromJson([
+                AkeneoAttributeData::fromJson([
                     'code' => 'color',
                     'type' => AkeneoAttributeType::SIMPLESELECT,
                     'localizable' => true,
