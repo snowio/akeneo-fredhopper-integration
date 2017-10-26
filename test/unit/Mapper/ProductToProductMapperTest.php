@@ -51,7 +51,7 @@ class ProductToProductMapperTest extends TestCase
                     ->withCategoryIdMapper(function (string $categoryId) {
                         return $categoryId . '_mapped';
                     })
-                    ->withProductIdMapper(function (string $channel, string $sku) {
+                    ->withProductIdMapper(function (string $sku) {
                         return $sku . '_mapped';
                     }),
                 AkeneoProductData::fromJson([

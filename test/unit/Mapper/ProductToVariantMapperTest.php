@@ -46,7 +46,7 @@ class ProductToVariantMapperTest extends TestCase
             ],
             'testVariantWithCustomMappers' => [
                 ProductToVariantMapper::create()
-                    ->withVariantGroupCodeToProductIdMapper(function (string $channel, string $vgCode) {
+                    ->withVariantGroupCodeToProductIdMapper(function (string $vgCode, string $channel) {
                         return "{$channel}_{$vgCode}";
                     }),
                 AkeneoProductData::fromJson([
@@ -65,7 +65,7 @@ class ProductToVariantMapperTest extends TestCase
                     'enabled' => true,
                     '@timestamp' => 1508491122,
                 ]),
-                FredhopperVariantData::of('v_abc123', 'abc')->withAttributeValue(AttributeValue::of('size', 'Large')),
+                FredhopperVariantData::of('v_abc123', 'main_abc')->withAttributeValue(AttributeValue::of('size', 'Large')),
             ],
             'testStandaloneProductWithDefaultMappers' => [
                 ProductToVariantMapper::create(),
@@ -89,10 +89,10 @@ class ProductToVariantMapperTest extends TestCase
             ],
             'testStandaloneProductWithCustomMappers' => [
                 ProductToVariantMapper::create()
-                    ->withSkuToProductIdMapper(function (string $channel, string $sku) {
+                    ->withSkuToProductIdMapper(function (string $sku, string $channel) {
                         return "{$channel}_{$sku}";
                     })
-                    ->withSkuToVariantIdMapper(function (string $channel, string $sku) {
+                    ->withSkuToVariantIdMapper(function (string $sku, string $channel) {
                         return "{$channel}_v_{$sku}";
                     }),
                 AkeneoProductData::fromJson([
@@ -111,7 +111,7 @@ class ProductToVariantMapperTest extends TestCase
                     'enabled' => true,
                     '@timestamp' => 1508491122,
                 ]),
-                FredhopperVariantData::of('main_v_abc123', 'abc123_mapped')->withAttributeValue(AttributeValue::of('size', 'Large')),
+                FredhopperVariantData::of('main_v_abc123', 'main_abc123')->withAttributeValue(AttributeValue::of('size', 'Large')),
             ],
         ];
     }

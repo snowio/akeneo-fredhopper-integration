@@ -28,7 +28,7 @@ class VariantGroupProductMapperTest extends TestCase
         return [
             'withMappers' => [
                 VariantGroupToProductMapper::create()
-                    ->withProductIdMapper(function (string $channel, string $variantGroupCode) {
+                    ->withProductIdMapper(function (string $variantGroupCode, string $channel) {
                         return "{$channel}_{$variantGroupCode}";
                     })
                     ->withAttributeValueMapper(new class implements AttributeValueMapper {

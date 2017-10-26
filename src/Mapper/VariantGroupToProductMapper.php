@@ -14,7 +14,7 @@ class VariantGroupToProductMapper
 
     public function map(VariantGroupData $variantGroup): FredhopperProductData
     {
-        $productId = ($this->productIdMapper)($variantGroup->getChannel(), $variantGroup->getCode());
+        $productId = ($this->productIdMapper)($variantGroup->getCode(), $variantGroup->getChannel());
         $akeneoAttributeValues = $variantGroup->getAttributeValues();
         $fredhopperAttributeValues = $this->attributeValueMapper->map($akeneoAttributeValues);
         return FredhopperProductData::of($productId)->withAttributeValues($fredhopperAttributeValues);
@@ -41,7 +41,7 @@ class VariantGroupToProductMapper
 
     private function __construct()
     {
-        $this->productIdMapper = function (string $channel, string $variantGroupCode) {
+        $this->productIdMapper = function (string $variantGroupCode, string $channel) {
             return $variantGroupCode;
         };
         $this->attributeValueMapper = SimpleAttributeValueMapper::create();

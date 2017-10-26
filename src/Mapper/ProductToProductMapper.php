@@ -15,9 +15,7 @@ class ProductToProductMapper
 
     public function map(AkeneoProductData $akeneoProductData): FredhopperProductData
     {
-        $channel = $akeneoProductData->getChannel();
-        $sku = $akeneoProductData->getSku();
-        $productId = ($this->productIdMapper)($channel, $sku);
+        $productId = ($this->productIdMapper)($akeneoProductData->getSku(), $akeneoProductData->getChannel());
         $categoryCodes = $akeneoProductData->getProperties()->getCategories()
             ->getCategoryCodes();
         $categoryIds = \array_map(function (string $categoryCode) {
@@ -30,17 +28,17 @@ class ProductToProductMapper
             ->withAttributeValues($fredhopperAttributeValues);
     }
 
-    public function withCategoryIdMapper(callable $fn): self
-    {
-        $result = clone $this;
-        $result->categoryIdMapper = $fn;
-        return $result;
-    }
-
     public function withProductIdMapper(callable $fn): self
     {
         $result = clone $this;
         $result->productIdMapper = $fn;
+        return $result;
+    }
+
+    public function withCategoryIdMapper(callable $fn): self
+    {
+        $result = clone $this;
+        $result->categoryIdMapper = $fn;
         return $result;
     }
 
@@ -61,7 +59,7 @@ class ProductToProductMapper
     private function __construct()
     {
         $this->categoryIdMapper = function ($categoryCode) { return $categoryCode; };
-        $this->productIdMapper = function (string $channel, string $sku) {
+        $this->productIdMapper = function (string $sku, string $channel) {
             return $sku;
         };
         $this->attributeValueMapper = SimpleAttributeValueMapper::create();

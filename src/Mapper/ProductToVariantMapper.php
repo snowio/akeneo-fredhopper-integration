@@ -16,12 +16,12 @@ class ProductToVariantMapper
     {
         $channel = $akeneoProductData->getChannel();
         $sku = $akeneoProductData->getSku();
-        $variantId = ($this->variantIdMapper)($channel, $sku);
+        $variantId = ($this->variantIdMapper)($sku, $channel);
         $variantGroupCode = $akeneoProductData->getProperties()->getVariantGroup();
         if ($variantGroupCode === null) {
-            $productId = ($this->skuToProductIdMapper)($channel, $sku);
+            $productId = ($this->skuToProductIdMapper)($sku, $channel);
         } else {
-            $productId = ($this->variantGroupCodeToProductIdMapper)($channel, $variantGroupCode);
+            $productId = ($this->variantGroupCodeToProductIdMapper)($variantGroupCode, $channel);
         }
         $akeneoAttributeValues = $akeneoProductData->getAttributeValues();
         $fredhopperAttributeValues = $this->attributeValueMapper->map($akeneoAttributeValues);
@@ -70,13 +70,13 @@ class ProductToVariantMapper
 
     private function __construct()
     {
-        $this->skuToProductIdMapper = function (string $channel, string $sku) {
+        $this->skuToProductIdMapper = function (string $sku, string $channel) {
             return $sku;
         };
-        $this->variantGroupCodeToProductIdMapper = function (string $channel, string $code) {
+        $this->variantGroupCodeToProductIdMapper = function (string $code, string $channel) {
             return $code;
         };
-        $this->variantIdMapper = function (string $channel, string $sku) {
+        $this->variantIdMapper = function (string $sku, string $channel) {
             return "v_{$sku}";
         };
         $this->attributeValueMapper = SimpleAttributeValueMapper::create();
