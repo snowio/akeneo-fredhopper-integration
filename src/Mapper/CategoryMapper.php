@@ -3,10 +3,7 @@ declare(strict_types=1);
 namespace SnowIO\AkeneoFredhopper\Mapper;
 
 use SnowIO\AkeneoDataModel\CategoryData as AkeneoCategoryData;
-use SnowIO\AkeneoDataModel\InternationalizedString as AkeneoInternationalizedString;
-use SnowIO\AkeneoDataModel\LocalizedString;
 use SnowIO\FredhopperDataModel\CategoryData as FredhopperCategoryData;
-use SnowIO\FredhopperDataModel\InternationalizedString as FredhopperInternationalizedString;
 
 class CategoryMapper
 {
@@ -48,14 +45,7 @@ class CategoryMapper
 
     private function __construct()
     {
-        $this->categoryIdMapper = function (string $categoryCode) { return $categoryCode; };
-        $this->nameMapper = function (AkeneoInternationalizedString $labels) {
-            $result = FredhopperInternationalizedString::create();
-            /** @var LocalizedString $label */
-            foreach ($labels as $label) {
-                $result = $result->withValue($label->getValue(), $label->getLocale());
-            }
-            return $result;
-        };
+        $this->categoryIdMapper = [FredhopperCategoryData::class, 'sanitizeId'];
+        $this->nameMapper = [InternationalizedStringMapper::create(), 'map'];
     }
 }

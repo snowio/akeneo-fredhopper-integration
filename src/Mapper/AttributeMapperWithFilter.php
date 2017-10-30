@@ -3,6 +3,7 @@ declare(strict_types=1);
 namespace SnowIO\AkeneoFredhopper\Mapper;
 
 use SnowIO\AkeneoDataModel\AttributeData;
+use SnowIO\FredhopperDataModel\AttributeDataSet;
 
 class AttributeMapperWithFilter implements AttributeMapper
 {
@@ -14,11 +15,11 @@ class AttributeMapperWithFilter implements AttributeMapper
         return $filterableAttributeMapper;
     }
 
-    public function map(AttributeData $akeneoAttributeData): array
+    public function map(AttributeData $akeneoAttributeData): AttributeDataSet
     {
         $filterResult = ($this->filter)($akeneoAttributeData);
         if (!$filterResult) {
-            return [];
+            return AttributeDataSet::create();
         }
         return $this->mapper->map($akeneoAttributeData);
     }

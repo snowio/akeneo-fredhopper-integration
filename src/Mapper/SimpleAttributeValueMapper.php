@@ -2,7 +2,6 @@
 declare(strict_types=1);
 namespace SnowIO\AkeneoFredhopper\Mapper;
 
-use SnowIO\AkeneoDataModel\AttributeValue;
 use SnowIO\AkeneoDataModel\AttributeValueSet as AkeneoAttributeValueSet;
 use SnowIO\AkeneoDataModel\PriceCollection;
 use SnowIO\FredhopperDataModel\AttributeValueSet as FredhopperAttributeValueSet;
@@ -13,25 +12,25 @@ class SimpleAttributeValueMapper implements AttributeValueMapper
 {
     public static function create()
     {
-        return AttributeValueMapperWithFilter::of(
-            new self,
-            function (AttributeValue $attributeValue) {
-                return !$attributeValue->getValue() instanceof PriceCollection;
-            }
-        );
+        return new self;
     }
 
     public function map(AkeneoAttributeValueSet $akeneoAttributeValues): FredhopperAttributeValueSet
     {
-        $attributeValues = [];
+        $akeneoAttributeValues = $akeneoAttributeValues->filter(function (AkeneoAttributeValue $attributeValue) {
+            return !$attributeValue->getValue() instanceof PriceCollection;
+        });
+
+        /** @var FredhopperAttributeValueSet $attributeValues */
+        $attributeValues = FredhopperAttributeValueSet::create();
         /** @var AkeneoAttributeValue $akeneoAttributeValue */
         foreach ($akeneoAttributeValues as $akeneoAttributeValue) {
-            $attributeValues[] = FredhopperAttributeValue::of(
+            $attributeValues = $attributeValues->with(FredhopperAttributeValue::of(
                 $akeneoAttributeValue->getAttributeCode(),
                 $akeneoAttributeValue->getValue()
-            );
+            ));
         }
-        return FredhopperAttributeValueSet::of($attributeValues);
+        return $attributeValues;
     }
 
     private function __construct()

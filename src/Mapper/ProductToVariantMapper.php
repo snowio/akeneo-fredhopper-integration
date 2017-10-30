@@ -3,6 +3,7 @@ declare(strict_types=1);
 namespace SnowIO\AkeneoFredhopper\Mapper;
 
 use SnowIO\AkeneoDataModel\ProductData as AkeneoProductData;
+use SnowIO\FredhopperDataModel\ProductData;
 use SnowIO\FredhopperDataModel\VariantData as FredhopperVariantData;
 
 class ProductToVariantMapper
@@ -70,14 +71,10 @@ class ProductToVariantMapper
 
     private function __construct()
     {
-        $this->skuToProductIdMapper = function (string $sku, string $channel) {
-            return $sku;
-        };
-        $this->variantGroupCodeToProductIdMapper = function (string $code, string $channel) {
-            return $code;
-        };
+        $this->skuToProductIdMapper = [ProductData::class, 'sanitizeId'];
+        $this->variantGroupCodeToProductIdMapper = [ProductData::class, 'sanitizeId'];
         $this->variantIdMapper = function (string $sku, string $channel) {
-            return "v_{$sku}";
+            return FredhopperVariantData::sanitizeId("v_{$sku}");
         };
         $this->attributeValueMapper = SimpleAttributeValueMapper::create();
     }

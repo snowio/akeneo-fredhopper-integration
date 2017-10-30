@@ -5,6 +5,7 @@ namespace SnowIO\AkeneoFredhopper\Mapper;
 use PHPUnit\Framework\TestCase;
 use SnowIO\AkeneoDataModel\AttributeData as AkeneoAttributeData;
 use SnowIO\AkeneoDataModel\AttributeType as AkeneoAttributeType;
+use SnowIO\FredhopperDataModel\AttributeDataSet;
 use SnowIO\FredhopperDataModel\AttributeType as FredhopperAttributeType;
 use SnowIO\FredhopperDataModel\AttributeData as FredhopperAttributeData;
 use SnowIO\FredhopperDataModel\InternationalizedString;
@@ -14,13 +15,13 @@ class CompositeAttributeMapperTest extends TestCase
     /**
      * @dataProvider mapDataProvider
      */
-    public function testMap(CompositeAttributeMapper $mapper, AkeneoAttributeData $input, array $expectedOutput)
-    {
+    public function testMap(
+        CompositeAttributeMapper $mapper,
+        AkeneoAttributeData $input,
+        AttributeDataSet $expectedOutput
+    ) {
         $actualOutput = $mapper->map($input);
-        $renderJson = function (FredhopperAttributeData $attribute) {
-            return $attribute->toJson();
-        };
-        self::assertEquals(\array_map($renderJson, $expectedOutput), \array_map($renderJson, $actualOutput));
+        self::assertTrue($actualOutput->equals($expectedOutput));
     }
 
     public function mapDataProvider()
@@ -56,7 +57,7 @@ class CompositeAttributeMapperTest extends TestCase
                     'group' => 'general',
                     '@timestamp' => 1508491122,
                 ]),
-                [
+                AttributeDataSet::of([
                     FredhopperAttributeData::of(
                         'size_mapper_modified_1',
                         FredhopperAttributeType::TEXT,
@@ -78,7 +79,7 @@ class CompositeAttributeMapperTest extends TestCase
                             ->withValue('Size', 'en_GB')
                             ->withValue('Größe', 'de_DE')
                     ),
-                ],
+                ]),
             ]
         ];
     }

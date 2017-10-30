@@ -50,24 +50,17 @@ class AttributeOptionMapperTest extends TestCase
                     ->withDisplayValue(FredhopperLocalizedString::of('Grand', 'fr_FR'))
                     ->withDisplayValue(FredhopperLocalizedString::of('Large', 'en_GB')),
             ],
-            'noLabelsWithAttributeIdMapper' => [
+            'noLabelsWithIdMappers' => [
                 AttributeOptionMapper::create()
-                    ->withAttributeIdMapper(function (string $attributeCode) {
-                        return $attributeCode . '_modified';
+                    ->withAttributeIdMapper(function (string $akeneoAttributeCode) {
+                        return $akeneoAttributeCode . '_modified';
                     })
-                    ->withDisplayValueMapper(function (AkeneoInternationalizedString $optionLabels) {
-                        return FredhopperInternationalizedString::create()
-                            ->withValue($optionLabels->getValue('en_GB'), 'en_GB')
-                            ->withValue($optionLabels->getValue('de_DE'), 'de_DE')
-                            ->withValue($optionLabels->getValue('eu_FR'), 'fr_FR');
+                    ->withValueIdMapper(function (string $akeneoOptionCode) {
+                        return $akeneoOptionCode . '_modified';
                     }),
                 AkeneoAttributeOption::of(AttributeOptionIdentifier::of('size', 'large'))
-                    ->withLabel(AkeneoLocalizedString::of('Groß', 'de_DE'))
-                    ->withLabel(AkeneoLocalizedString::of('Grand', 'eu_FR'))
                     ->withLabel(AkeneoLocalizedString::of('Large', 'en_GB')),
-                FredhopperAttributeOption::of('size_modified', 'large')
-                    ->withDisplayValue(FredhopperLocalizedString::of('Groß', 'de_DE'))
-                    ->withDisplayValue(FredhopperLocalizedString::of('Grand', 'fr_FR'))
+                FredhopperAttributeOption::of('size_modified', 'large_modified')
                     ->withDisplayValue(FredhopperLocalizedString::of('Large', 'en_GB')),
             ],
             'labelsWithDisplayValueMapper' => [
@@ -85,7 +78,11 @@ class AttributeOptionMapperTest extends TestCase
                     ->withDisplayValue(FredhopperLocalizedString::of('Groß', 'de_DE'))
                     ->withDisplayValue(FredhopperLocalizedString::of('Large', 'en_GB')),
             ],
-
+            'idSanitization' => [
+                AttributeOptionMapper::create(),
+                AkeneoAttributeOption::of(AttributeOptionIdentifier::of('Size!', 'LARGE!')),
+                FredhopperAttributeOption::of('size', 'large'),
+            ],
         ];
     }
 }

@@ -5,6 +5,7 @@ namespace SnowIO\AkeneoFredhopper\Mapper;
 use PHPUnit\Framework\TestCase;
 use SnowIO\AkeneoDataModel\AttributeData as AkeneoAttributeData;
 use SnowIO\AkeneoDataModel\AttributeType as AkeneoAttributeType;
+use SnowIO\FredhopperDataModel\AttributeDataSet;
 use SnowIO\FredhopperDataModel\AttributeType as FredhopperAttributeType;
 use SnowIO\FredhopperDataModel\AttributeData as FredhopperAttributeData;
 use SnowIO\FredhopperDataModel\InternationalizedString;
@@ -14,10 +15,13 @@ class LocalizableAttributeMapperTest extends TestCase
     /**
      * @dataProvider mapDataProvider
      */
-    public function testMap(LocalizableAttributeMapper $mapper, AkeneoAttributeData $input, array $expectedOutput)
-    {
+    public function testMap(
+        LocalizableAttributeMapper $mapper,
+        AkeneoAttributeData $input,
+        AttributeDataSet $expectedOutput
+    ) {
         $actualOutput = $mapper->map($input);
-        self::assertEquals($this->getJson($expectedOutput), $this->getJson($actualOutput));
+        self::assertTrue($actualOutput->equals($expectedOutput));
     }
 
     /**
@@ -26,13 +30,6 @@ class LocalizableAttributeMapperTest extends TestCase
     public function testInvalidCreationOfMapper()
     {
         LocalizableAttributeMapper::of([]);
-    }
-
-    public function getJson(array $fredhopperAttributes)
-    {
-        return array_map(function (FredhopperAttributeData $attribute) {
-            return $attribute->toJson();
-        }, $fredhopperAttributes);
     }
 
     public function mapDataProvider()
@@ -56,7 +53,7 @@ class LocalizableAttributeMapperTest extends TestCase
                     'group' => 'general',
                     '@timestamp' => 1508491122,
                 ]),
-                [
+                AttributeDataSet::of([
                     FredhopperAttributeData::of(
                         'size_en_gb',
                         FredhopperAttributeType::LIST,
@@ -71,7 +68,7 @@ class LocalizableAttributeMapperTest extends TestCase
                             ->withValue('Size', 'en_GB')
                             ->withValue('Taille', 'fr_FR')
                     ),
-                ],
+                ]),
             ],
             'testAutomaticLocales' => [
                 LocalizableAttributeMapper::create()->withTypeMapper(function (string $type) {
@@ -90,7 +87,7 @@ class LocalizableAttributeMapperTest extends TestCase
                     'group' => 'general',
                     '@timestamp' => 1508491122,
                 ]),
-                [
+                AttributeDataSet::of([
                     FredhopperAttributeData::of(
                         'size_en_gb',
                         FredhopperAttributeType::LIST,
@@ -105,7 +102,7 @@ class LocalizableAttributeMapperTest extends TestCase
                             ->withValue('Size', 'en_GB')
                             ->withValue('Taille', 'fr_FR')
                     ),
-                ],
+                ]),
             ],
         ];
     }

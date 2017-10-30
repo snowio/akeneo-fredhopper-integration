@@ -3,37 +3,30 @@ declare(strict_types=1);
 namespace SnowIO\AkeneoFredhopper\Mapper;
 
 use SnowIO\AkeneoDataModel\AttributeData as AkeneoAttributeData;
-use SnowIO\AkeneoDataModel\InternationalizedString as AkeneoInternationalizedString;
-use SnowIO\AkeneoDataModel\LocalizedString;
 use SnowIO\FredhopperDataModel\AttributeData as FredhopperAttributeData;
 use SnowIO\AkeneoDataModel\AttributeType as AkeneoAttributeType;
+use SnowIO\FredhopperDataModel\AttributeDataSet;
 use SnowIO\FredhopperDataModel\AttributeType as FredhopperAttributeType;
-use SnowIO\FredhopperDataModel\InternationalizedString as FredhopperInternationalizedString;
 
 class PriceAttributeMapper implements AttributeMapper
 {
     public static function of(array $currencies): self
     {
-        $mapper = new self;
-        $mapper->currencies = $currencies;
-        return $mapper;
+        return new self($currencies);
     }
 
-    /**
-     * @return FredhopperAttributeData[]
-     * @throws \Exception
-     */
-    public function map(AkeneoAttributeData $akeneoAttributeData): array
+    public function map(AkeneoAttributeData $akeneoAttributeData): AttributeDataSet
     {
         if ($akeneoAttributeData->getType() !== AkeneoAttributeType::PRICE_COLLECTION) {
-            throw new \Exception;
+            return AttributeDataSet::create();
         }
 
-        $attributes = [];
+        /** @var AttributeDataSet $attributes */
+        $attributes = AttributeDataSet::create();
         foreach ($this->currencies as $currency) {
             $attributeId = "{$akeneoAttributeData->getCode()}_" . \strtolower($currency);
             $attributeNames = ($this->nameMapper)($akeneoAttributeData->getLabels());
-            $attributes[] = FredhopperAttributeData::of($attributeId, FredhopperAttributeType::FLOAT, $attributeNames);
+            $attributes = $attributes->with(FredhopperAttributeData::of($attributeId, FredhopperAttributeType::FLOAT, $attributeNames));
         }
         return $attributes;
     }
@@ -45,18 +38,13 @@ class PriceAttributeMapper implements AttributeMapper
         return $result;
     }
 
+    /** @var string[] */
     private $currencies;
     private $nameMapper;
 
-    private function __construct()
+    private function __construct(array $currencies)
     {
-        $this->nameMapper = function (AkeneoInternationalizedString $labels) {
-            $result = FredhopperInternationalizedString::create();
-            /** @var LocalizedString $label */
-            foreach ($labels as $label) {
-                $result = $result->withValue($label->getValue(), $label->getLocale());
-            }
-            return $result;
-        };
+        $this->currencies = $currencies;
+        $this->nameMapper = [InternationalizedStringMapper::create(), 'map'];
     }
 }

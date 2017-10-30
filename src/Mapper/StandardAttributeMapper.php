@@ -4,11 +4,9 @@ namespace SnowIO\AkeneoFredhopper\Mapper;
 
 use SnowIO\AkeneoDataModel\AttributeData as AkeneoAttributeData;
 use SnowIO\AkeneoDataModel\AttributeType as AkeneoAttributeType;
-use SnowIO\AkeneoDataModel\InternationalizedString as AkeneoInternationalizedString;
-use SnowIO\AkeneoDataModel\LocalizedString;
+use SnowIO\FredhopperDataModel\AttributeDataSet;
 use SnowIO\FredhopperDataModel\AttributeType as FredhopperAttributeType;
 use SnowIO\FredhopperDataModel\AttributeData as FredhopperAttributeData;
-use SnowIO\FredhopperDataModel\InternationalizedString as FredhopperInternationalizedString;
 
 class StandardAttributeMapper implements AttributeMapper
 {
@@ -17,15 +15,22 @@ class StandardAttributeMapper implements AttributeMapper
         return new self;
     }
 
-    public function map(AkeneoAttributeData $akeneoAttributeData): array
+    public function map(AkeneoAttributeData $akeneoAttributeData): AttributeDataSet
     {
         $attributeId = ($this->attributeIdMapper)($akeneoAttributeData->getCode());
         $labels = ($this->nameMapper)($akeneoAttributeData->getLabels());
         if ($akeneoAttributeData->isLocalizable()) {
-            return [FredhopperAttributeData::of($attributeId, FredhopperAttributeType::ASSET, $labels)];
+            return AttributeDataSet::of([FredhopperAttributeData::of($attributeId, FredhopperAttributeType::ASSET, $labels)]);
         }
         $fredhopperType = ($this->typeMapper)($akeneoAttributeData->getType());
-        return [FredhopperAttributeData::of($attributeId, $fredhopperType, $labels)];
+        return AttributeDataSet::of([FredhopperAttributeData::of($attributeId, $fredhopperType, $labels)]);
+    }
+
+    public function withAttributeIdMapper(callable $fn): self
+    {
+        $result = clone $this;
+        $result->attributeIdMapper = $fn;
+        return $result;
     }
 
     public function withTypeMapper(callable $fn): self
@@ -39,13 +44,6 @@ class StandardAttributeMapper implements AttributeMapper
     {
         $result = clone $this;
         $result->nameMapper = $fn;
-        return $result;
-    }
-
-    public function withAttributeIdMapper(callable $fn): self
-    {
-        $result = clone $this;
-        $result->attributeIdMapper = $fn;
         return $result;
     }
 
@@ -63,23 +61,14 @@ class StandardAttributeMapper implements AttributeMapper
         };
     }
 
+    private $attributeIdMapper;
     private $typeMapper;
     private $nameMapper;
-    private $attributeIdMapper;
 
     private function __construct()
     {
+        $this->attributeIdMapper = [FredhopperAttributeData::class, 'sanitizeId'];
         $this->typeMapper = self::getDefaultTypeMapper();
-        $this->attributeIdMapper = function (string $code) {
-            return $code;
-        };
-        $this->nameMapper = function (AkeneoInternationalizedString $labels) {
-            $result = FredhopperInternationalizedString::create();
-            /** @var LocalizedString $label */
-            foreach ($labels as $label) {
-                $result = $result->withValue($label->getValue(), $label->getLocale());
-            }
-            return $result;
-        };
+        $this->nameMapper = [InternationalizedStringMapper::create(), 'map'];
     }
 }

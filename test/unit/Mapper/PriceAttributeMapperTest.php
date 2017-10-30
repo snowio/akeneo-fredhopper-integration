@@ -6,6 +6,7 @@ use PHPUnit\Framework\TestCase;
 use SnowIO\AkeneoDataModel\AttributeData as AkeneoAttribute;
 use SnowIO\AkeneoDataModel\AttributeType as AkeneoAttributeType;
 use SnowIO\FredhopperDataModel\AttributeData as FredhopperAttribute;
+use SnowIO\FredhopperDataModel\AttributeDataSet;
 use SnowIO\FredhopperDataModel\AttributeType as FredhopperAttributeType;
 use SnowIO\FredhopperDataModel\InternationalizedString;
 
@@ -14,26 +15,13 @@ class PriceAttributeMapperTest extends TestCase
     /**
      * @dataProvider mapDataProvider
      */
-    public function testMap(PriceAttributeMapper $mapper, AkeneoAttribute $input, array $expectedOutput)
-    {
+    public function testMap(
+        PriceAttributeMapper $mapper,
+        AkeneoAttribute $input,
+        AttributeDataSet $expectedOutput
+    ) {
         $actualOutput = $mapper->map($input);
-        self::assertEquals($this->getJson($expectedOutput), $this->getJson($actualOutput));
-    }
-
-    /**
-     * @dataProvider invalidMapDataProvider
-     * @expectedException \Exception
-     */
-    public function testMapWithNonPriceType(PriceAttributeMapper $mapper, AkeneoAttribute $input)
-    {
-        $mapper->map($input);
-    }
-
-    public function getJson(array $expectedFredhopperAttributes)
-    {
-        return array_map(function (FredhopperAttribute $attribute) {
-            return $attribute->toJson();
-        }, $expectedFredhopperAttributes);
+        self::assertTrue($actualOutput->equals($expectedOutput));
     }
 
     public function mapDataProvider()
@@ -56,7 +44,7 @@ class PriceAttributeMapperTest extends TestCase
                     'group' => 'general',
                     '@timestamp' => 1508491122,
                 ]),
-                [
+                AttributeDataSet::of([
                     FredhopperAttribute::of(
                         'price_gbp',
                         FredhopperAttributeType::FLOAT,
@@ -67,7 +55,7 @@ class PriceAttributeMapperTest extends TestCase
                         FredhopperAttributeType::FLOAT,
                         InternationalizedString::create()->withValue('Price', 'en_GB')
                     ),
-                ],
+                ]),
             ],
             'without-currencies' => [
                 PriceAttributeMapper::of([]),
@@ -83,16 +71,8 @@ class PriceAttributeMapperTest extends TestCase
                     'group' => 'general',
                     '@timestamp' => 1508491122,
                 ]),
-                [
-                    //todo should we return an empty array really
-                ],
-            ]
-        ];
-    }
-
-    public function invalidMapDataProvider()
-    {
-        return [
+                AttributeDataSet::create(),
+            ],
             'test-with-non-price-type' => [
                 PriceAttributeMapper::of([
                     'gbp',
@@ -111,6 +91,7 @@ class PriceAttributeMapperTest extends TestCase
                     'group' => 'general',
                     '@timestamp' => 1508491122,
                 ]),
+                AttributeDataSet::create(),
             ],
         ];
     }

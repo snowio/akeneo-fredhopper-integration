@@ -7,6 +7,7 @@ use SnowIO\AkeneoDataModel\AttributeData as AkeneoAttributeData;
 use SnowIO\AkeneoDataModel\AttributeType as AkeneoAttributeType;
 use SnowIO\AkeneoDataModel\InternationalizedString as AkeneoInternationalizedString;
 use SnowIO\FredhopperDataModel\AttributeData as FredhopperAttributeData;
+use SnowIO\FredhopperDataModel\AttributeDataSet;
 use SnowIO\FredhopperDataModel\AttributeType as FredhopperAttributeType;
 use SnowIO\FredhopperDataModel\InternationalizedString as FredhopperInternationalizedString;
 
@@ -18,10 +19,10 @@ class StandardAttributeMapperTest extends TestCase
     public function testMap(
         StandardAttributeMapper $mapper,
         AkeneoAttributeData $input,
-        array $expectedOutput
+        AttributeDataSet $expectedOutput
     ) {
         $actualOutput = $mapper->map($input);
-        self::assertEquals($this->getJson($expectedOutput), $this->getJson($actualOutput));
+        self::assertTrue($actualOutput->equals($expectedOutput));
     }
 
     private function getJson(array $fredhopperAttributes)
@@ -49,7 +50,7 @@ class StandardAttributeMapperTest extends TestCase
                     'group' => 'general',
                     '@timestamp' => 1508491122,
                 ]),
-                [
+                AttributeDataSet::of([
                     FredhopperAttributeData::of(
                         'size',
                         FredhopperAttributeType::ASSET,
@@ -57,7 +58,7 @@ class StandardAttributeMapperTest extends TestCase
                             ->withValue('Size', 'en_GB')
                             ->withValue('Taille', 'fr_FR')
                     ),
-                ],
+                ]),
             ],
             'testNonLocalizableAttribute' => [
                 StandardAttributeMapper::create(),
@@ -74,7 +75,7 @@ class StandardAttributeMapperTest extends TestCase
                     'group' => 'general',
                     '@timestamp' => 1508491122,
                 ]),
-                [
+                AttributeDataSet::of([
                     FredhopperAttributeData::of(
                         'size',
                         FredhopperAttributeType::LIST,
@@ -82,7 +83,7 @@ class StandardAttributeMapperTest extends TestCase
                             ->withValue('Size', 'en_GB')
                             ->withValue('Taille', 'fr_FR')
                     ),
-                ],
+                ]),
             ],
             'testNonLocalizableAttributeWithNameMapper' => [
                 StandardAttributeMapper::create()
@@ -108,13 +109,13 @@ class StandardAttributeMapperTest extends TestCase
                     'group' => 'general',
                     '@timestamp' => 1508491122,
                 ]),
-                [
+                AttributeDataSet::of([
                     FredhopperAttributeData::of(
                         'size_mapped',
                         FredhopperAttributeType::ASSET,
                         FredhopperInternationalizedString::create()->withValue('Size', 'en_GB')
                     ),
-                ],
+                ]),
             ],
         ];
     }

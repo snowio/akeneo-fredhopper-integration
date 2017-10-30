@@ -8,6 +8,7 @@ use SnowIO\AkeneoDataModel\CategoryPath;
 use SnowIO\AkeneoDataModel\InternationalizedString as AkeneoInternationalizedString;
 use SnowIO\AkeneoDataModel\LocalizedString;
 use SnowIO\FredhopperDataModel\CategoryData as FredhopperCategoryData;
+use SnowIO\FredhopperDataModel\CategoryData;
 use SnowIO\FredhopperDataModel\InternationalizedString as FredhopperInternationalizedString;
 
 class CategoryMapperTest extends TestCase
@@ -33,7 +34,7 @@ class CategoryMapperTest extends TestCase
                     ->withLabel(LocalizedString::of('T-Shirts', 'en_GB'))
                     ->withLabel(LocalizedString::of('Tee-shirt', 'fr_FR')),
                 FredhopperCategoryData::of(
-                    't_shirts',
+                    'tshirts',
                     FredhopperInternationalizedString::create()
                         ->withValue('T-Shirts', 'en_GB')
                         ->withValue('Tee-shirt', 'fr_FR')
@@ -47,7 +48,7 @@ class CategoryMapperTest extends TestCase
                     ->withLabel(LocalizedString::of('T-Shirts', 'en_GB'))
                     ->withLabel(LocalizedString::of('Tee-shirt', 'fr_FR')),
                 FredhopperCategoryData::of(
-                    't_shirts',
+                    'tshirts',
                     FredhopperInternationalizedString::create()
                         ->withValue('T-Shirts', 'en_GB')
                         ->withValue('Tee-shirt', 'fr_FR')
@@ -55,17 +56,17 @@ class CategoryMapperTest extends TestCase
             ],
             'withCategoryIdMapper' => [
                 CategoryMapper::create()->withCategoryIdMapper(function (string $categoryCode) {
-                    return "foo_$categoryCode";
+                    return CategoryData::sanitizeId("foo_$categoryCode");
                 }),
                 AkeneoCategoryData::of(CategoryPath::of(['clothes', 't_shirts']))
                     ->withLabel(LocalizedString::of('T-Shirts', 'en_GB'))
                     ->withLabel(LocalizedString::of('Tee-shirt', 'fr_FR')),
                 FredhopperCategoryData::of(
-                    'foo_t_shirts',
+                    'footshirts',
                     FredhopperInternationalizedString::create()
                         ->withValue('T-Shirts', 'en_GB')
                         ->withValue('Tee-shirt', 'fr_FR')
-                )->withParent('foo_clothes'),
+                )->withParent('fooclothes'),
             ],
             'withNameMapper' => [
                 CategoryMapper::create()->withNameMapper(function (AkeneoInternationalizedString $labels) {
@@ -77,7 +78,7 @@ class CategoryMapperTest extends TestCase
                     ->withLabel(LocalizedString::of('T-Shirts', 'en_GB'))
                     ->withLabel(LocalizedString::of('Tee-shirt', 'en_FR')),
                 FredhopperCategoryData::of(
-                    't_shirts',
+                    'tshirts',
                     FredhopperInternationalizedString::create()
                         ->withValue('T-Shirts', 'en_GB')
                         ->withValue('Tee-shirt', 'fr_FR')

@@ -2,8 +2,8 @@
     "name": "snowio/akeneo-fredhopper-integration",
     "require": {
         "php": ">=7.1",
-        "snowio/akeneo-data-model": "^0.1.2",
-        "snowio/fredhopper-data-model": "^0.1"
+        "snowio/akeneo-data-model": "^0.1.4",
+        "snowio/fredhopper-data-model": "^0.1.3"
     },
     "require-dev": {
         "phpunit/phpunit": "^6.4"

@@ -3,6 +3,7 @@ declare(strict_types=1);
 namespace SnowIO\AkeneoFredhopper\Mapper;
 
 use SnowIO\AkeneoDataModel\AttributeData as AkeneoAttributeData;
+use SnowIO\FredhopperDataModel\AttributeDataSet;
 
 class CompositeAttributeMapper implements AttributeMapper
 {
@@ -11,11 +12,12 @@ class CompositeAttributeMapper implements AttributeMapper
         return new self;
     }
 
-    public function map(AkeneoAttributeData $akeneoAttributeData): array
+    public function map(AkeneoAttributeData $akeneoAttributeData): AttributeDataSet
     {
-        $fredhopperAttributes = [];
+        /** @var AttributeDataSet $fredhopperAttributes */
+        $fredhopperAttributes = AttributeDataSet::create();
         foreach ($this->mappers as $mapper) {
-            $fredhopperAttributes = \array_merge($fredhopperAttributes, $mapper->map($akeneoAttributeData));
+            $fredhopperAttributes = $fredhopperAttributes->add($mapper->map($akeneoAttributeData));
         }
         return $fredhopperAttributes;
     }

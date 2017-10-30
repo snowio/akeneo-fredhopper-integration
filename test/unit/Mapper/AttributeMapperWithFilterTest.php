@@ -6,6 +6,7 @@ use PHPUnit\Framework\TestCase;
 use SnowIO\AkeneoDataModel\AttributeData as AkeneoAttributeData;
 use SnowIO\AkeneoDataModel\AttributeType as AkeneoAttributeType;
 use SnowIO\FredhopperDataModel\AttributeData as FredhopperAttributeData;
+use SnowIO\FredhopperDataModel\AttributeDataSet;
 use SnowIO\FredhopperDataModel\AttributeType as FredhopperAttributeType;
 use SnowIO\FredhopperDataModel\InternationalizedString;
 
@@ -14,7 +15,7 @@ class AttributeMapperWithFilterTest extends TestCase
     /**
      * @dataProvider mapDataProvider
      */
-    public function testMap(AkeneoAttributeData $akeneoAttribute, array $expected)
+    public function testMap(AkeneoAttributeData $akeneoAttribute, AttributeDataSet $expectedOutput)
     {
         $mapper = AttributeMapperWithFilter::of(
             StandardAttributeMapper::create(),
@@ -22,11 +23,8 @@ class AttributeMapperWithFilterTest extends TestCase
                 return $akeneoAttributeData->getCode() === 'size';
             }
         );
-        $actual = $mapper->map($akeneoAttribute);
-        $getJson = function (FredhopperAttributeData $fredhopperAttribute) {
-            return $fredhopperAttribute->toJson();
-        };
-        self::assertEquals(array_map($getJson, $expected), array_map($getJson, $actual));
+        $actualOutput = $mapper->map($akeneoAttribute);
+        self::assertTrue($actualOutput->equals($expectedOutput));
     }
 
     public function mapDataProvider()
@@ -46,15 +44,14 @@ class AttributeMapperWithFilterTest extends TestCase
                     'group' => 'general',
                     '@timestamp' => 1508491122,
                 ]),
-                [
-                    FredhopperAttributeData::of(
+                AttributeDataSet::create()
+                    ->with(FredhopperAttributeData::of(
                         'size',
                         FredhopperAttributeType::LIST,
                         InternationalizedString::create()
                             ->withValue('Size', 'en_GB')
                             ->withValue('Taille', 'fr_FR')
-                    ),
-                ],
+                    )),
             ],
             'testFilterByAttributeIdReturnsEmptyArray' => [
                 AkeneoAttributeData::fromJson([
@@ -70,7 +67,7 @@ class AttributeMapperWithFilterTest extends TestCase
                     'group' => 'swatch',
                     '@timestamp' => 1508491122,
                 ]),
-                [],
+                AttributeDataSet::create(),
             ],
         ];
     }

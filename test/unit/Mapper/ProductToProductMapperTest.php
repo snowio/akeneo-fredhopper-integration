@@ -5,6 +5,7 @@ namespace SnowIO\AkeneoFredhopper\Mapper;
 use PHPUnit\Framework\TestCase;
 use SnowIO\AkeneoDataModel\ProductData as AkeneoProductData;
 use SnowIO\FredhopperDataModel\AttributeValue;
+use SnowIO\FredhopperDataModel\CategoryData;
 use SnowIO\FredhopperDataModel\CategoryIdSet;
 use SnowIO\FredhopperDataModel\ProductData as FredhopperProductData;
 
@@ -43,13 +44,13 @@ class ProductToProductMapperTest extends TestCase
                     '@timestamp' => 1508491122,
                 ]),
                 FredhopperProductData::of('abc123')
-                    ->withCategoryIds(CategoryIdSet::of(['t_shirts', 'trousers']))
+                    ->withCategoryIds(CategoryIdSet::of(['tshirts', 'trousers']))
                     ->withAttributeValue(AttributeValue::of('size', 'Large')),
             ],
             'testWithCustomMappers' => [
                 ProductToProductMapper::create()
                     ->withCategoryIdMapper(function (string $categoryId) {
-                        return $categoryId . '_mapped';
+                        return CategoryData::sanitizeId($categoryId . '_mapped');
                     })
                     ->withProductIdMapper(function (string $sku) {
                         return $sku . '_mapped';
@@ -70,7 +71,7 @@ class ProductToProductMapperTest extends TestCase
                     '@timestamp' => 1508491122,
                 ]),
                 FredhopperProductData::of('abc123_mapped')
-                    ->withCategoryIds(CategoryIdSet::of(['t_shirts_mapped', 'trousers_mapped']))
+                    ->withCategoryIds(CategoryIdSet::of(['tshirtsmapped', 'trousersmapped']))
                     ->withAttributeValue(AttributeValue::of('size', 'Large')),
             ],
         ];

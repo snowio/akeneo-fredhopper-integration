@@ -4,38 +4,49 @@ namespace SnowIO\AkeneoFredhopper\Mapper;
 
 use SnowIO\AkeneoDataModel\AttributeValue as AkeneoAttributeValue;
 use SnowIO\AkeneoDataModel\AttributeValueSet as AkeneoAttributeValueSet;
+use SnowIO\FredhopperDataModel\AttributeData;
 use SnowIO\FredhopperDataModel\AttributeValue as FredhopperAttributeValue;
 use SnowIO\FredhopperDataModel\AttributeValueSet as FredhopperAttributeValueSet;
 
 class LocalizableAttributeValueMapper implements AttributeValueMapper
 {
-    public static function create(): AttributeValueMapper
+    public static function create(): LocalizableAttributeValueMapper
     {
-        return AttributeValueMapperWithFilter::of(
-            new self,
-            function (AkeneoAttributeValue $attributeValue) {
-                return $attributeValue->getScope()->getLocale() !== null;
-            }
-        );
+        return new self;
     }
 
     public function map(AkeneoAttributeValueSet $akeneoAttributeValues): FredhopperAttributeValueSet
     {
-        $fredhopperLocalizedAttributeValues = [];
+        $akeneoAttributeValues = $akeneoAttributeValues->filter(function (AkeneoAttributeValue $attributeValue) {
+            return $attributeValue->getScope()->getLocale() !== null;
+        });
+
+        /** @var FredhopperAttributeValueSet $attributeValues */
+        $attributeValues = FredhopperAttributeValueSet::create();
         /** @var AkeneoAttributeValue $akeneoAttributeValue */
         foreach ($akeneoAttributeValues as $akeneoAttributeValue) {
-            $locale = $akeneoAttributeValue->getScope()
-                ->getLocale();
-            $attributeId = "{$akeneoAttributeValue->getAttributeCode()}_" . \strtolower($locale);
+            $attributeCode = $akeneoAttributeValue->getAttributeCode();
+            $akeneoLocale = $akeneoAttributeValue->getScope()->getLocale();
+            $attributeId = ($this->attributeIdMapper)($attributeCode, $akeneoLocale);
             $value = $akeneoAttributeValue->getValue();
-            $fredhopperLocalizedAttributeValues[] = FredhopperAttributeValue::of($attributeId, $value);
+            $attributeValues = $attributeValues->with(FredhopperAttributeValue::of($attributeId, $value));
         }
-
-        return FredhopperAttributeValueSet::of($fredhopperLocalizedAttributeValues);
+        return $attributeValues;
     }
+
+    public function withAttributeIdMapper(callable $fn): self
+    {
+        $result = clone $this;
+        $result->attributeIdMapper = $fn;
+        return $result;
+    }
+
+    private $attributeIdMapper;
 
     private function __construct()
     {
-
+        $this->attributeIdMapper = function (string $akeneoAttributeCode, string $akeneoLocale) {
+            return AttributeData::sanitizeId("{$akeneoAttributeCode}_{$akeneoLocale}");
+        };
     }
 }

@@ -3,10 +3,8 @@ declare(strict_types=1);
 namespace SnowIO\AkeneoFredhopper\Mapper;
 
 use SnowIO\AkeneoDataModel\AttributeOption as AkeneoAttributeOption;
-use SnowIO\AkeneoDataModel\InternationalizedString as AkeneoInternationalizedString;
-use SnowIO\AkeneoDataModel\LocalizedString;
+use SnowIO\FredhopperDataModel\AttributeData;
 use SnowIO\FredhopperDataModel\AttributeOption as FredhopperAttributeOption;
-use SnowIO\FredhopperDataModel\InternationalizedString as FredhopperInternationalizedString;
 
 class AttributeOptionMapper
 {
@@ -18,7 +16,7 @@ class AttributeOptionMapper
     public function map(AkeneoAttributeOption $attributeOption): FredhopperAttributeOption
     {
         $attributeId = ($this->attributeIdMapper)($attributeOption->getAttributeCode());
-        $valueId = $attributeOption->getOptionCode();
+        $valueId = ($this->valueIdMapper)($attributeOption->getOptionCode());
         $labels = ($this->displayValueMapper)($attributeOption->getLabels());
         return FredhopperAttributeOption::of($attributeId, $valueId)->withDisplayValues($labels);
     }
@@ -30,6 +28,13 @@ class AttributeOptionMapper
         return $result;
     }
 
+    public function withValueIdMapper(callable $fn): self
+    {
+        $result = clone $this;
+        $result->valueIdMapper = $fn;
+        return $result;
+    }
+
     public function withDisplayValueMapper(callable $fn): self
     {
         $result = clone $this;
@@ -38,18 +43,13 @@ class AttributeOptionMapper
     }
 
     private $attributeIdMapper;
+    private $valueIdMapper;
     private $displayValueMapper;
 
     private function __construct()
     {
-        $this->attributeIdMapper = function (string $code) { return $code; };
-        $this->displayValueMapper = function (AkeneoInternationalizedString $labels) {
-            $result = FredhopperInternationalizedString::create();
-            /** @var LocalizedString $label */
-            foreach ($labels as $label) {
-                $result = $result->withValue($label->getValue(), $label->getLocale());
-            }
-            return $result;
-        };
+        $this->attributeIdMapper = [AttributeData::class, 'sanitizeId'];
+        $this->valueIdMapper = [FredhopperAttributeOption::class, 'sanitizeValueId'];
+        $this->displayValueMapper = [InternationalizedStringMapper::create(), 'map'];
     }
 }
