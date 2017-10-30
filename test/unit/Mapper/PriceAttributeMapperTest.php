@@ -20,7 +20,7 @@ class PriceAttributeMapperTest extends TestCase
         AkeneoAttribute $input,
         AttributeDataSet $expectedOutput
     ) {
-        $actualOutput = $mapper->map($input);
+        $actualOutput = $mapper($input);
         self::assertTrue($actualOutput->equals($expectedOutput));
     }
 

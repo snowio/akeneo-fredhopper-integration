@@ -23,7 +23,7 @@ class AttributeMapperWithFilterTest extends TestCase
                 return $akeneoAttributeData->getCode() === 'size';
             }
         );
-        $actualOutput = $mapper->map($akeneoAttribute);
+        $actualOutput = $mapper($akeneoAttribute);
         self::assertTrue($actualOutput->equals($expectedOutput));
     }
 

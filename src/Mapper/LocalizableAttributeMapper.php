@@ -6,7 +6,7 @@ use SnowIO\AkeneoDataModel\AttributeData as AkeneoAttributeData;
 use SnowIO\FredhopperDataModel\AttributeData as FredhopperAttributeData;
 use SnowIO\FredhopperDataModel\AttributeDataSet;
 
-class LocalizableAttributeMapper implements AttributeMapper
+class LocalizableAttributeMapper
 {
     public static function create(): self
     {
@@ -24,7 +24,7 @@ class LocalizableAttributeMapper implements AttributeMapper
         return $mapper;
     }
 
-    public function map(AkeneoAttributeData $akeneoAttributeData): AttributeDataSet
+    public function __invoke(AkeneoAttributeData $akeneoAttributeData): AttributeDataSet
     {
         /** @var AttributeDataSet $attributes */
         $attributes = AttributeDataSet::create();
@@ -70,6 +70,6 @@ class LocalizableAttributeMapper implements AttributeMapper
             return FredhopperAttributeData::sanitizeId("{$akeneoAttributeCode}_{$locale}");
         };
         $this->typeMapper = StandardAttributeMapper::getDefaultTypeMapper();
-        $this->nameMapper = [InternationalizedStringMapper::create(), 'map'];
+        $this->nameMapper = InternationalizedStringMapper::create();
     }
 }

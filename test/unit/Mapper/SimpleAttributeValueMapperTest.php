@@ -16,7 +16,7 @@ class SimpleAttributeValueMapperTest extends TestCase
      */
     public function testMap(AkeneoAttributeValueSet $input, FredhopperAttributeValueSet $expectedOutput)
     {
-        $actualOutput = SimpleAttributeValueMapper::create()->map($input);
+        $actualOutput = (SimpleAttributeValueMapper::create())($input);
         self::assertTrue($actualOutput->equals($expectedOutput));
     }
 

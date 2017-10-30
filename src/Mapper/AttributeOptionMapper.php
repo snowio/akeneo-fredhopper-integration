@@ -13,7 +13,7 @@ class AttributeOptionMapper
         return new self;
     }
 
-    public function map(AkeneoAttributeOption $attributeOption): FredhopperAttributeOption
+    public function __invoke(AkeneoAttributeOption $attributeOption): FredhopperAttributeOption
     {
         $attributeId = ($this->attributeIdMapper)($attributeOption->getAttributeCode());
         $valueId = ($this->valueIdMapper)($attributeOption->getOptionCode());
@@ -50,6 +50,6 @@ class AttributeOptionMapper
     {
         $this->attributeIdMapper = [AttributeData::class, 'sanitizeId'];
         $this->valueIdMapper = [FredhopperAttributeOption::class, 'sanitizeValueId'];
-        $this->displayValueMapper = [InternationalizedStringMapper::create(), 'map'];
+        $this->displayValueMapper = InternationalizedStringMapper::create();
     }
 }

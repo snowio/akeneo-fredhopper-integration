@@ -5,9 +5,9 @@ namespace SnowIO\AkeneoFredhopper\Mapper;
 use SnowIO\AkeneoDataModel\AttributeValueSet as AkeneoAttributeValueSet;
 use SnowIO\FredhopperDataModel\AttributeValueSet as FredhopperAttributeValueSet;
 
-class AttributeValueMapperWithFilter implements AttributeValueMapper
+class AttributeValueMapperWithFilter
 {
-    public static function of(AttributeValueMapper $mapper, callable $filter): self
+    public static function of(callable $mapper, callable $filter): self
     {
         $mapperWithFilter = new self;
         $mapperWithFilter->mapper = $mapper;
@@ -15,13 +15,13 @@ class AttributeValueMapperWithFilter implements AttributeValueMapper
         return $mapperWithFilter;
     }
 
-    public function map(AkeneoAttributeValueSet $akeneoAttributeValues): FredhopperAttributeValueSet
+    public function __invoke(AkeneoAttributeValueSet $akeneoAttributeValues): FredhopperAttributeValueSet
     {
         $filteredAttributeValues = $akeneoAttributeValues->filter($this->filter);
-        return $this->mapper->map($filteredAttributeValues);
+        return ($this->mapper)($filteredAttributeValues);
     }
 
-    /** @var AttributeValueMapper */
+    /** @var callable */
     private $mapper;
     /** @var callable */
     private $filter;

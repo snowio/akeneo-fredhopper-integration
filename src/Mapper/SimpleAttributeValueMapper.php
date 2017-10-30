@@ -8,14 +8,14 @@ use SnowIO\FredhopperDataModel\AttributeValueSet as FredhopperAttributeValueSet;
 use SnowIO\FredhopperDataModel\AttributeValue as FredhopperAttributeValue;
 use SnowIO\AkeneoDataModel\AttributeValue as AkeneoAttributeValue;
 
-class SimpleAttributeValueMapper implements AttributeValueMapper
+class SimpleAttributeValueMapper
 {
     public static function create()
     {
         return new self;
     }
 
-    public function map(AkeneoAttributeValueSet $akeneoAttributeValues): FredhopperAttributeValueSet
+    public function __invoke(AkeneoAttributeValueSet $akeneoAttributeValues): FredhopperAttributeValueSet
     {
         $akeneoAttributeValues = $akeneoAttributeValues->filter(function (AkeneoAttributeValue $attributeValue) {
             return !$attributeValue->getValue() instanceof PriceCollection;

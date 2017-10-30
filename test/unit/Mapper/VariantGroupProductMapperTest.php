@@ -19,7 +19,7 @@ class VariantGroupProductMapperTest extends TestCase
         VariantGroupData $input,
         FredhopperProductData $expectedOutput
     ) {
-        $actualOutput = $mapper->map($input);
+        $actualOutput = $mapper($input);
         self::assertTrue($actualOutput->equals($expectedOutput));
     }
 
@@ -31,11 +31,8 @@ class VariantGroupProductMapperTest extends TestCase
                     ->withProductIdMapper(function (string $variantGroupCode, string $channel) {
                         return "{$channel}_{$variantGroupCode}";
                     })
-                    ->withAttributeValueMapper(new class implements AttributeValueMapper {
-                        public function map(AkeneoAttributeValueSet $akeneoAttributeValues): FredhopperAttributeValueSet
-                        {
-                            return FredhopperAttributeValueSet::create()->with(FredhopperAttributeValue::of('foo', 'bar'));
-                        }
+                    ->withAttributeValueMapper(function(AkeneoAttributeValueSet $akeneoAttributeValues) {
+                        return FredhopperAttributeValueSet::create()->with(FredhopperAttributeValue::of('foo', 'bar'));
                     }),
                 VariantGroupData::fromJson([
                     'code' => '1001425',

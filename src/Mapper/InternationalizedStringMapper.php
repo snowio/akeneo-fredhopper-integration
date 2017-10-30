@@ -12,7 +12,7 @@ class InternationalizedStringMapper
         return new self;
     }
 
-    public function map(AkeneoInternationalizedString $akeneoInternationalizedString): FredhopperInternationalizedString
+    public function __invoke(AkeneoInternationalizedString $akeneoInternationalizedString): FredhopperInternationalizedString
     {
         /** @var FredhopperInternationalizedString $result */
         $result = FredhopperInternationalizedString::create();

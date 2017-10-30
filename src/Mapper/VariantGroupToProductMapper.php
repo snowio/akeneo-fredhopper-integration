@@ -12,11 +12,11 @@ class VariantGroupToProductMapper
         return new self;
     }
 
-    public function map(VariantGroupData $variantGroup): FredhopperProductData
+    public function __invoke(VariantGroupData $variantGroup): FredhopperProductData
     {
         $productId = ($this->productIdMapper)($variantGroup->getCode(), $variantGroup->getChannel());
         $akeneoAttributeValues = $variantGroup->getAttributeValues();
-        $fredhopperAttributeValues = $this->attributeValueMapper->map($akeneoAttributeValues);
+        $fredhopperAttributeValues = ($this->attributeValueMapper)($akeneoAttributeValues);
         return FredhopperProductData::of($productId)->withAttributeValues($fredhopperAttributeValues);
     }
 

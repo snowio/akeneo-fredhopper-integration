@@ -17,11 +17,11 @@ class CategoryMapperTest extends TestCase
      * @dataProvider mapDataProvider
      */
     public function testMap(
-        CategoryMapper $categoryMapper,
+        CategoryMapper $mapper,
         AkeneoCategoryData $input,
         FredhopperCategoryData $expectedOutput
     ) {
-        $actualOutput = $categoryMapper->map($input);
+        $actualOutput = $mapper($input);
         self::assertTrue($actualOutput->equals($expectedOutput));
     }
 

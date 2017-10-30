@@ -14,7 +14,7 @@ class PriceAttributeValueMapperTest extends TestCase
      */
     public function testMap(AkeneoAttributeValueSet $input, FredhopperAttributeValueSet $expectedOutput)
     {
-        $actualOutput = PriceAttributeValueMapper::create()->map($input);
+        $actualOutput = (PriceAttributeValueMapper::create())($input);
         self::assertTrue($actualOutput->equals($expectedOutput));
     }
 

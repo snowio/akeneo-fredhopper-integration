@@ -14,11 +14,11 @@ class AttributeValueMapperWithFilterTest extends TestCase
      * @dataProvider mapDataProvider
      */
     public function testMap(
-        AttributeValueMapper $mapper,
+        AttributeValueMapperWithFilter $mapper,
         AkeneoAttributeValueSet $akeneoAttributeValues,
         FredhopperAttributeValueSet $expectedOutput
     ) {
-        $actualOutput = $mapper->map($akeneoAttributeValues);
+        $actualOutput = $mapper($akeneoAttributeValues);
         self::assertTrue($actualOutput->equals($expectedOutput));
     }
 

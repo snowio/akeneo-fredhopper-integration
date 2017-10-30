@@ -13,7 +13,7 @@ class ProductToVariantMapper
         return new self;
     }
 
-    public function map(AkeneoProductData $akeneoProductData): ?FredhopperVariantData
+    public function __invoke(AkeneoProductData $akeneoProductData): ?FredhopperVariantData
     {
         $channel = $akeneoProductData->getChannel();
         $sku = $akeneoProductData->getSku();
@@ -25,7 +25,7 @@ class ProductToVariantMapper
             $productId = ($this->variantGroupCodeToProductIdMapper)($variantGroupCode, $channel);
         }
         $akeneoAttributeValues = $akeneoProductData->getAttributeValues();
-        $fredhopperAttributeValues = $this->attributeValueMapper->map($akeneoAttributeValues);
+        $fredhopperAttributeValues = ($this->attributeValueMapper)($akeneoAttributeValues);
         return FredhopperVariantData::of($variantId, $productId)->withAttributeValues($fredhopperAttributeValues);
     }
 

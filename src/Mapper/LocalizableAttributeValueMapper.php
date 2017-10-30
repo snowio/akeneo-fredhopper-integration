@@ -8,14 +8,14 @@ use SnowIO\FredhopperDataModel\AttributeData;
 use SnowIO\FredhopperDataModel\AttributeValue as FredhopperAttributeValue;
 use SnowIO\FredhopperDataModel\AttributeValueSet as FredhopperAttributeValueSet;
 
-class LocalizableAttributeValueMapper implements AttributeValueMapper
+class LocalizableAttributeValueMapper
 {
     public static function create(): LocalizableAttributeValueMapper
     {
         return new self;
     }
 
-    public function map(AkeneoAttributeValueSet $akeneoAttributeValues): FredhopperAttributeValueSet
+    public function __invoke(AkeneoAttributeValueSet $akeneoAttributeValues): FredhopperAttributeValueSet
     {
         $akeneoAttributeValues = $akeneoAttributeValues->filter(function (AkeneoAttributeValue $attributeValue) {
             return $attributeValue->getScope()->getLocale() !== null;

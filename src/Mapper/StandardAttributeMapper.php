@@ -8,14 +8,14 @@ use SnowIO\FredhopperDataModel\AttributeDataSet;
 use SnowIO\FredhopperDataModel\AttributeType as FredhopperAttributeType;
 use SnowIO\FredhopperDataModel\AttributeData as FredhopperAttributeData;
 
-class StandardAttributeMapper implements AttributeMapper
+class StandardAttributeMapper
 {
     public static function create(): self
     {
         return new self;
     }
 
-    public function map(AkeneoAttributeData $akeneoAttributeData): AttributeDataSet
+    public function __invoke(AkeneoAttributeData $akeneoAttributeData): AttributeDataSet
     {
         $attributeId = ($this->attributeIdMapper)($akeneoAttributeData->getCode());
         $labels = ($this->nameMapper)($akeneoAttributeData->getLabels());
@@ -69,6 +69,6 @@ class StandardAttributeMapper implements AttributeMapper
     {
         $this->attributeIdMapper = [FredhopperAttributeData::class, 'sanitizeId'];
         $this->typeMapper = self::getDefaultTypeMapper();
-        $this->nameMapper = [InternationalizedStringMapper::create(), 'map'];
+        $this->nameMapper = InternationalizedStringMapper::create();
     }
 }

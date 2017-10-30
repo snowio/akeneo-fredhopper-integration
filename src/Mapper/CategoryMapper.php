@@ -12,7 +12,7 @@ class CategoryMapper
         return new self;
     }
 
-    public function map(AkeneoCategoryData $akeneoCategory): FredhopperCategoryData
+    public function __invoke(AkeneoCategoryData $akeneoCategory): FredhopperCategoryData
     {
         $categoryId = ($this->categoryIdMapper)($akeneoCategory->getCode());
         $names = ($this->nameMapper)($akeneoCategory->getLabels());
@@ -46,6 +46,6 @@ class CategoryMapper
     private function __construct()
     {
         $this->categoryIdMapper = [FredhopperCategoryData::class, 'sanitizeId'];
-        $this->nameMapper = [InternationalizedStringMapper::create(), 'map'];
+        $this->nameMapper = InternationalizedStringMapper::create();
     }
 }

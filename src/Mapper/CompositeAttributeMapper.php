@@ -5,31 +5,31 @@ namespace SnowIO\AkeneoFredhopper\Mapper;
 use SnowIO\AkeneoDataModel\AttributeData as AkeneoAttributeData;
 use SnowIO\FredhopperDataModel\AttributeDataSet;
 
-class CompositeAttributeMapper implements AttributeMapper
+class CompositeAttributeMapper
 {
     public static function create()
     {
         return new self;
     }
 
-    public function map(AkeneoAttributeData $akeneoAttributeData): AttributeDataSet
+    public function __invoke(AkeneoAttributeData $akeneoAttributeData): AttributeDataSet
     {
         /** @var AttributeDataSet $fredhopperAttributes */
         $fredhopperAttributes = AttributeDataSet::create();
         foreach ($this->mappers as $mapper) {
-            $fredhopperAttributes = $fredhopperAttributes->add($mapper->map($akeneoAttributeData));
+            $fredhopperAttributes = $fredhopperAttributes->add($mapper($akeneoAttributeData));
         }
         return $fredhopperAttributes;
     }
 
-    public function with(AttributeMapper $attributeMapper): self
+    public function with(callable $attributeMapper): self
     {
         $result = clone $this;
         $result->mappers[] = $attributeMapper;
         return $result;
     }
 
-    /** @var AttributeMapper[] */
+    /** @var callable[] */
     private $mappers = [];
 
     private function __construct()

@@ -17,7 +17,7 @@ class CompositeAttributeValueMapperTest extends TestCase
         AkeneoAttributeValueSet $input,
         FredhopperAttributeValueSet $expectedOutput
     ) {
-        $actualOutput = $mapper->map($input);
+        $actualOutput = $mapper($input);
         self::assertTrue($actualOutput->equals($expectedOutput));
     }
 

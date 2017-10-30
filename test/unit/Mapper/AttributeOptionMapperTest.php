@@ -21,7 +21,7 @@ class AttributeOptionMapperTest extends TestCase
         AkeneoAttributeOption $input,
         FredhopperAttributeOption $expectedOutput
     ) {
-        $actualOutput = $mapper->map($input);
+        $actualOutput = $mapper($input);
         self::assertTrue($actualOutput->equals($expectedOutput));
     }
 

@@ -20,7 +20,7 @@ class CompositeAttributeMapperTest extends TestCase
         AkeneoAttributeData $input,
         AttributeDataSet $expectedOutput
     ) {
-        $actualOutput = $mapper->map($input);
+        $actualOutput = $mapper($input);
         self::assertTrue($actualOutput->equals($expectedOutput));
     }
 

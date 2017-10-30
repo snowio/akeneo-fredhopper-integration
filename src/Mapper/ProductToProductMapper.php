@@ -14,7 +14,7 @@ class ProductToProductMapper
         return new self;
     }
 
-    public function map(AkeneoProductData $akeneoProductData): FredhopperProductData
+    public function __invoke(AkeneoProductData $akeneoProductData): FredhopperProductData
     {
         $productId = ($this->productIdMapper)($akeneoProductData->getSku(), $akeneoProductData->getChannel());
         $categoryCodes = $akeneoProductData->getProperties()->getCategories()
@@ -23,7 +23,7 @@ class ProductToProductMapper
             return ($this->categoryIdMapper)($categoryCode);
         }, $categoryCodes);
         $akeneoAttributeValues = $akeneoProductData->getAttributeValues();
-        $fredhopperAttributeValues = $this->attributeValueMapper->map($akeneoAttributeValues);
+        $fredhopperAttributeValues = ($this->attributeValueMapper)($akeneoAttributeValues);
         return FredhopperProductData::of($productId)
             ->withCategoryIds(CategoryIdSet::of($categoryIds))
             ->withAttributeValues($fredhopperAttributeValues);

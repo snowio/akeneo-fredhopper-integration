@@ -8,14 +8,14 @@ use SnowIO\AkeneoDataModel\AttributeType as AkeneoAttributeType;
 use SnowIO\FredhopperDataModel\AttributeDataSet;
 use SnowIO\FredhopperDataModel\AttributeType as FredhopperAttributeType;
 
-class PriceAttributeMapper implements AttributeMapper
+class PriceAttributeMapper
 {
     public static function of(array $currencies): self
     {
         return new self($currencies);
     }
 
-    public function map(AkeneoAttributeData $akeneoAttributeData): AttributeDataSet
+    public function __invoke(AkeneoAttributeData $akeneoAttributeData): AttributeDataSet
     {
         if ($akeneoAttributeData->getType() !== AkeneoAttributeType::PRICE_COLLECTION) {
             return AttributeDataSet::create();
@@ -45,6 +45,6 @@ class PriceAttributeMapper implements AttributeMapper
     private function __construct(array $currencies)
     {
         $this->currencies = $currencies;
-        $this->nameMapper = [InternationalizedStringMapper::create(), 'map'];
+        $this->nameMapper = InternationalizedStringMapper::create();
     }
 }

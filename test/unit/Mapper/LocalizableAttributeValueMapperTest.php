@@ -14,7 +14,7 @@ class LocalizableAttributeValueMapperTest extends TestCase
      */
     public function testMap(AkeneoAttributeValueSet $input, FredhopperAttributeValueSet $expectedOutput)
     {
-        $actualOutput = LocalizableAttributeValueMapper::create()->map($input);
+        $actualOutput = (LocalizableAttributeValueMapper::create())($input);
         self::assertTrue($actualOutput->equals($expectedOutput));
     }
 
