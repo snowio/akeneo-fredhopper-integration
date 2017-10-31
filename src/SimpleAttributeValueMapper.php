@@ -25,10 +25,11 @@ class SimpleAttributeValueMapper
         $attributeValues = FredhopperAttributeValueSet::create();
         /** @var AkeneoAttributeValue $akeneoAttributeValue */
         foreach ($akeneoAttributeValues as $akeneoAttributeValue) {
-            $attributeValues = $attributeValues->with(FredhopperAttributeValue::of(
-                $akeneoAttributeValue->getAttributeCode(),
-                $akeneoAttributeValue->getValue()
-            ));
+            $attributeCode = $akeneoAttributeValue->getAttributeCode();
+            $value = $akeneoAttributeValue->getValue();
+            $locale = $akeneoAttributeValue->getScope()->getLocale();
+            $fredhopperAttributeValue = FredhopperAttributeValue::of($attributeCode, $value)->withLocale($locale);
+            $attributeValues = $attributeValues->with($fredhopperAttributeValue);
         }
         return $attributeValues;
     }
