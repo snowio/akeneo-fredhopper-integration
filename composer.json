@@ -3,7 +3,7 @@
     "require": {
         "php": ">=7.1",
         "snowio/akeneo-data-model": "^0.1.4",
-        "snowio/fredhopper-data-model": "^0.1.9"
+        "snowio/fredhopper-data-model": "^0.2"
     },
     "require-dev": {
         "phpunit/phpunit": "^6.4"
