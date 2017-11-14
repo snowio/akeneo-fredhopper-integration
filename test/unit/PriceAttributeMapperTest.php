@@ -1,10 +1,11 @@
 <?php
 declare(strict_types=1);
-namespace SnowIO\AkeneoFredhopper;
+namespace SnowIO\AkeneoFredhopper\Test;
 
 use PHPUnit\Framework\TestCase;
 use SnowIO\AkeneoDataModel\AttributeData as AkeneoAttribute;
 use SnowIO\AkeneoDataModel\AttributeType as AkeneoAttributeType;
+use SnowIO\AkeneoFredhopper\PriceAttributeMapper;
 use SnowIO\FredhopperDataModel\AttributeData as FredhopperAttribute;
 use SnowIO\FredhopperDataModel\AttributeDataSet;
 use SnowIO\FredhopperDataModel\AttributeType as FredhopperAttributeType;

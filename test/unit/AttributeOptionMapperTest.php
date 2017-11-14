@@ -1,13 +1,15 @@
 <?php
 declare(strict_types=1);
-namespace SnowIO\AkeneoFredhopper;
+namespace SnowIO\AkeneoFredhopper\Test;
 
 use PHPUnit\Framework\TestCase;
 use SnowIO\AkeneoDataModel\AttributeOption as AkeneoAttributeOption;
 use SnowIO\AkeneoDataModel\AttributeOptionIdentifier;
 use SnowIO\AkeneoDataModel\InternationalizedString as AkeneoInternationalizedString;
 use SnowIO\AkeneoDataModel\LocalizedString as AkeneoLocalizedString;
+use SnowIO\AkeneoFredhopper\AttributeOptionMapper;
 use SnowIO\FredhopperDataModel\AttributeOption as FredhopperAttributeOption;
+use SnowIO\FredhopperDataModel\AttributeOptionSet;
 use SnowIO\FredhopperDataModel\InternationalizedString as FredhopperInternationalizedString;
 use SnowIO\FredhopperDataModel\LocalizedString as FredhopperLocalizedString;
 
@@ -19,7 +21,7 @@ class AttributeOptionMapperTest extends TestCase
     public function testMap(
         AttributeOptionMapper $mapper,
         AkeneoAttributeOption $input,
-        FredhopperAttributeOption $expectedOutput
+        AttributeOptionSet $expectedOutput
     ) {
         $actualOutput = $mapper($input);
         self::assertTrue($actualOutput->equals($expectedOutput));
@@ -31,7 +33,7 @@ class AttributeOptionMapperTest extends TestCase
             'noLabels' => [
                 AttributeOptionMapper::create(),
                 AkeneoAttributeOption::of(AttributeOptionIdentifier::of('size', 'large')),
-                FredhopperAttributeOption::of('size', 'large'),
+                AttributeOptionSet::of([FredhopperAttributeOption::of('size', 'large')]),
             ],
             'labels' => [
                 AttributeOptionMapper::create()
@@ -45,10 +47,12 @@ class AttributeOptionMapperTest extends TestCase
                     ->withLabel(AkeneoLocalizedString::of('Groß', 'de_DE'))
                     ->withLabel(AkeneoLocalizedString::of('Grand', 'eu_FR'))
                     ->withLabel(AkeneoLocalizedString::of('Large', 'en_GB')),
-                FredhopperAttributeOption::of('size', 'large')
-                    ->withDisplayValue(FredhopperLocalizedString::of('Groß', 'de_DE'))
-                    ->withDisplayValue(FredhopperLocalizedString::of('Grand', 'fr_FR'))
-                    ->withDisplayValue(FredhopperLocalizedString::of('Large', 'en_GB')),
+                AttributeOptionSet::of([
+                    FredhopperAttributeOption::of('size', 'large')
+                        ->withDisplayValue(FredhopperLocalizedString::of('Groß', 'de_DE'))
+                        ->withDisplayValue(FredhopperLocalizedString::of('Grand', 'fr_FR'))
+                        ->withDisplayValue(FredhopperLocalizedString::of('Large', 'en_GB'))
+                ]),
             ],
             'noLabelsWithIdMappers' => [
                 AttributeOptionMapper::create()
@@ -60,8 +64,10 @@ class AttributeOptionMapperTest extends TestCase
                     }),
                 AkeneoAttributeOption::of(AttributeOptionIdentifier::of('size', 'large'))
                     ->withLabel(AkeneoLocalizedString::of('Large', 'en_GB')),
-                FredhopperAttributeOption::of('size_modified', 'large_modified')
-                    ->withDisplayValue(FredhopperLocalizedString::of('Large', 'en_GB')),
+                AttributeOptionSet::of([
+                    FredhopperAttributeOption::of('size_modified', 'large_modified')
+                        ->withDisplayValue(FredhopperLocalizedString::of('Large', 'en_GB'))
+                ]),
             ],
             'labelsWithDisplayValueMapper' => [
                 AttributeOptionMapper::create()
@@ -74,14 +80,14 @@ class AttributeOptionMapperTest extends TestCase
                     ->withLabel(AkeneoLocalizedString::of('Groß', 'de_DE'))
                     ->withLabel(AkeneoLocalizedString::of('Grand', 'eu_FR'))
                     ->withLabel(AkeneoLocalizedString::of('Large', 'en_GB')),
-                FredhopperAttributeOption::of('size', 'large')
+                AttributeOptionSet::of([FredhopperAttributeOption::of('size', 'large')
                     ->withDisplayValue(FredhopperLocalizedString::of('Groß', 'de_DE'))
-                    ->withDisplayValue(FredhopperLocalizedString::of('Large', 'en_GB')),
+                    ->withDisplayValue(FredhopperLocalizedString::of('Large', 'en_GB'))]),
             ],
             'idSanitization' => [
                 AttributeOptionMapper::create(),
                 AkeneoAttributeOption::of(AttributeOptionIdentifier::of('Size!', 'LARGE!')),
-                FredhopperAttributeOption::of('size', 'large'),
+                AttributeOptionSet::of([FredhopperAttributeOption::of('size', 'large')]),
             ],
         ];
     }

@@ -1,14 +1,16 @@
 <?php
 declare(strict_types=1);
-namespace SnowIO\AkeneoFredhopper;
+namespace SnowIO\AkeneoFredhopper\Test;
 
 use PHPUnit\Framework\TestCase;
 use SnowIO\AkeneoDataModel\CategoryData as AkeneoCategoryData;
 use SnowIO\AkeneoDataModel\CategoryPath;
 use SnowIO\AkeneoDataModel\InternationalizedString as AkeneoInternationalizedString;
 use SnowIO\AkeneoDataModel\LocalizedString;
+use SnowIO\AkeneoFredhopper\CategoryMapper;
 use SnowIO\FredhopperDataModel\CategoryData as FredhopperCategoryData;
 use SnowIO\FredhopperDataModel\CategoryData;
+use SnowIO\FredhopperDataModel\CategoryDataSet;
 use SnowIO\FredhopperDataModel\InternationalizedString as FredhopperInternationalizedString;
 
 class CategoryMapperTest extends TestCase
@@ -19,7 +21,7 @@ class CategoryMapperTest extends TestCase
     public function testMap(
         CategoryMapper $mapper,
         AkeneoCategoryData $input,
-        FredhopperCategoryData $expectedOutput
+        CategoryDataSet $expectedOutput
     ) {
         $actualOutput = $mapper($input);
         self::assertTrue($actualOutput->equals($expectedOutput));
@@ -28,31 +30,31 @@ class CategoryMapperTest extends TestCase
     public function mapDataProvider()
     {
         return [
-            'hasParent' => [
+            'hasParent' => array(
                 CategoryMapper::create(),
-                AkeneoCategoryData::of(CategoryPath::of(['clothes', 't_shirts']))
+                AkeneoCategoryData::of(CategoryPath::of(array('clothes', 't_shirts')))
                     ->withLabel(LocalizedString::of('T-Shirts', 'en_GB'))
                     ->withLabel(LocalizedString::of('Tee-shirt', 'fr_FR')),
-                FredhopperCategoryData::of(
+                CategoryDataSet::of([FredhopperCategoryData::of(
                     'tshirts',
                     FredhopperInternationalizedString::create()
                         ->withValue('T-Shirts', 'en_GB')
                         ->withValue('Tee-shirt', 'fr_FR')
-                )->withParent('clothes'),
+                )->withParent('clothes')]),
                 null,
                 null,
-            ],
+            ),
             'doesntHaveParent' => [
                 CategoryMapper::create(),
                 AkeneoCategoryData::of(CategoryPath::of(['t_shirts']))
                     ->withLabel(LocalizedString::of('T-Shirts', 'en_GB'))
                     ->withLabel(LocalizedString::of('Tee-shirt', 'fr_FR')),
-                FredhopperCategoryData::of(
+                CategoryDataSet::of([FredhopperCategoryData::of(
                     'tshirts',
                     FredhopperInternationalizedString::create()
                         ->withValue('T-Shirts', 'en_GB')
                         ->withValue('Tee-shirt', 'fr_FR')
-                ),
+                )]),
             ],
             'withCategoryIdMapper' => [
                 CategoryMapper::create()->withCategoryIdMapper(function (string $categoryCode) {
@@ -61,12 +63,12 @@ class CategoryMapperTest extends TestCase
                 AkeneoCategoryData::of(CategoryPath::of(['clothes', 't_shirts']))
                     ->withLabel(LocalizedString::of('T-Shirts', 'en_GB'))
                     ->withLabel(LocalizedString::of('Tee-shirt', 'fr_FR')),
-                FredhopperCategoryData::of(
+                CategoryDataSet::of([FredhopperCategoryData::of(
                     'footshirts',
                     FredhopperInternationalizedString::create()
                         ->withValue('T-Shirts', 'en_GB')
                         ->withValue('Tee-shirt', 'fr_FR')
-                )->withParent('fooclothes'),
+                )->withParent('fooclothes')]),
             ],
             'withNameMapper' => [
                 CategoryMapper::create()->withNameMapper(function (AkeneoInternationalizedString $labels) {
@@ -77,12 +79,12 @@ class CategoryMapperTest extends TestCase
                 AkeneoCategoryData::of(CategoryPath::of(['clothes', 't_shirts']))
                     ->withLabel(LocalizedString::of('T-Shirts', 'en_GB'))
                     ->withLabel(LocalizedString::of('Tee-shirt', 'en_FR')),
-                FredhopperCategoryData::of(
+                CategoryDataSet::of([FredhopperCategoryData::of(
                     'tshirts',
                     FredhopperInternationalizedString::create()
                         ->withValue('T-Shirts', 'en_GB')
                         ->withValue('Tee-shirt', 'fr_FR')
-                )->withParent('clothes'),
+                )->withParent('clothes')]),
             ],
         ];
     }

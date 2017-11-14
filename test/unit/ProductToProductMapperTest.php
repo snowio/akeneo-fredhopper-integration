@@ -1,13 +1,15 @@
 <?php
 declare(strict_types=1);
-namespace SnowIO\AkeneoFredhopper;
+namespace SnowIO\AkeneoFredhopper\Test;
 
 use PHPUnit\Framework\TestCase;
 use SnowIO\AkeneoDataModel\ProductData as AkeneoProductData;
+use SnowIO\AkeneoFredhopper\ProductToProductMapper;
 use SnowIO\FredhopperDataModel\AttributeValue;
 use SnowIO\FredhopperDataModel\CategoryData;
 use SnowIO\FredhopperDataModel\CategoryIdSet;
 use SnowIO\FredhopperDataModel\ProductData as FredhopperProductData;
+use SnowIO\FredhopperDataModel\ProductDataSet;
 
 class ProductToProductMapperTest extends TestCase
 {
@@ -17,7 +19,7 @@ class ProductToProductMapperTest extends TestCase
     public function testMap(
         ProductToProductMapper $mapper,
         AkeneoProductData $input,
-        FredhopperProductData $expectedOutput
+        ProductDataSet $expectedOutput
     ) {
         $actualOutput = $mapper($input);
         self::assertTrue($actualOutput->equals($expectedOutput));
@@ -43,9 +45,9 @@ class ProductToProductMapperTest extends TestCase
                     'enabled' => true,
                     '@timestamp' => 1508491122,
                 ]),
-                FredhopperProductData::of('abc123')
+                ProductDataSet::of([FredhopperProductData::of('abc123')
                     ->withCategoryIds(CategoryIdSet::of(['tshirts', 'trousers']))
-                    ->withAttributeValue(AttributeValue::of('size', 'Large')),
+                    ->withAttributeValue(AttributeValue::of('size', 'Large'))]),
             ],
             'testWithCustomMappers' => [
                 ProductToProductMapper::create()
@@ -70,9 +72,9 @@ class ProductToProductMapperTest extends TestCase
                     'enabled' => true,
                     '@timestamp' => 1508491122,
                 ]),
-                FredhopperProductData::of('abc123_mapped')
+                ProductDataSet::of([FredhopperProductData::of('abc123_mapped')
                     ->withCategoryIds(CategoryIdSet::of(['tshirtsmapped', 'trousersmapped']))
-                    ->withAttributeValue(AttributeValue::of('size', 'Large')),
+                    ->withAttributeValue(AttributeValue::of('size', 'Large'))]),
             ],
         ];
     }

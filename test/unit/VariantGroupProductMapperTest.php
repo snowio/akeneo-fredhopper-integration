@@ -1,13 +1,15 @@
 <?php
 declare(strict_types=1);
-namespace SnowIO\AkeneoFredhopper;
+namespace SnowIO\AkeneoFredhopper\Test;
 
 use PHPUnit\Framework\TestCase;
 use SnowIO\AkeneoDataModel\AttributeValueSet as AkeneoAttributeValueSet;
 use SnowIO\AkeneoDataModel\VariantGroupData;
+use SnowIO\AkeneoFredhopper\VariantGroupToProductMapper;
 use SnowIO\FredhopperDataModel\AttributeValue as FredhopperAttributeValue;
 use SnowIO\FredhopperDataModel\AttributeValueSet as FredhopperAttributeValueSet;
 use SnowIO\FredhopperDataModel\ProductData as FredhopperProductData;
+use SnowIO\FredhopperDataModel\ProductDataSet;
 
 class VariantGroupProductMapperTest extends TestCase
 {
@@ -17,7 +19,7 @@ class VariantGroupProductMapperTest extends TestCase
     public function testMap(
         VariantGroupToProductMapper $mapper,
         VariantGroupData $input,
-        FredhopperProductData $expectedOutput
+        ProductDataSet $expectedOutput
     ) {
         $actualOutput = $mapper($input);
         self::assertTrue($actualOutput->equals($expectedOutput));
@@ -42,8 +44,8 @@ class VariantGroupProductMapperTest extends TestCase
                         'color' => 'blue'
                     ],
                 ]),
-                FredhopperProductData::of('demontweeks_1001425')
-                    ->withAttributeValue(FredhopperAttributeValue::of('foo', 'bar')),
+                ProductDataSet::of([FredhopperProductData::of('demontweeks_1001425')
+                    ->withAttributeValue(FredhopperAttributeValue::of('foo', 'bar'))]),
             ],
             'withoutMappers' => [
                 VariantGroupToProductMapper::create(),
@@ -55,8 +57,8 @@ class VariantGroupProductMapperTest extends TestCase
                         'color' => 'blue'
                     ],
                 ]),
-                FredhopperProductData::of('1001425')
-                    ->withAttributeValue(FredhopperAttributeValue::of('color', 'blue')),
+                ProductDataSet::of([FredhopperProductData::of('1001425')
+                    ->withAttributeValue(FredhopperAttributeValue::of('color', 'blue'))]),
             ]
         ];
     }
