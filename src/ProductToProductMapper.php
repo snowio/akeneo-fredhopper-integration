@@ -6,6 +6,7 @@ use SnowIO\AkeneoDataModel\ProductData as AkeneoProductData;
 use SnowIO\FredhopperDataModel\CategoryData;
 use SnowIO\FredhopperDataModel\CategoryIdSet;
 use SnowIO\FredhopperDataModel\ProductData as FredhopperProductData;
+use SnowIO\FredhopperDataModel\ProductDataSet;
 
 class ProductToProductMapper
 {
@@ -14,7 +15,7 @@ class ProductToProductMapper
         return new self;
     }
 
-    public function __invoke(AkeneoProductData $akeneoProductData): FredhopperProductData
+    public function __invoke(AkeneoProductData $akeneoProductData): ProductDataSet
     {
         $productId = ($this->productIdMapper)($akeneoProductData->getSku(), $akeneoProductData->getChannel());
         $categoryCodes = $akeneoProductData->getProperties()->getCategories()
@@ -24,9 +25,9 @@ class ProductToProductMapper
         }, $categoryCodes);
         $akeneoAttributeValues = $akeneoProductData->getAttributeValues();
         $fredhopperAttributeValues = ($this->attributeValueMapper)($akeneoAttributeValues);
-        return FredhopperProductData::of($productId)
+        return ProductDataSet::of([FredhopperProductData::of($productId)
             ->withCategoryIds(CategoryIdSet::of($categoryIds))
-            ->withAttributeValues($fredhopperAttributeValues);
+            ->withAttributeValues($fredhopperAttributeValues)]);
     }
 
     public function withProductIdMapper(callable $fn): self

@@ -4,6 +4,7 @@ namespace SnowIO\AkeneoFredhopper;
 
 use SnowIO\AkeneoDataModel\CategoryData as AkeneoCategoryData;
 use SnowIO\FredhopperDataModel\CategoryData as FredhopperCategoryData;
+use SnowIO\FredhopperDataModel\CategoryDataSet;
 
 class CategoryMapper
 {
@@ -12,7 +13,7 @@ class CategoryMapper
         return new self;
     }
 
-    public function __invoke(AkeneoCategoryData $akeneoCategory): FredhopperCategoryData
+    public function __invoke(AkeneoCategoryData $akeneoCategory): CategoryDataSet
     {
         $categoryId = ($this->categoryIdMapper)($akeneoCategory->getCode());
         $names = ($this->nameMapper)($akeneoCategory->getLabels());
@@ -21,7 +22,7 @@ class CategoryMapper
             $parentId = ($this->categoryIdMapper)($akeneoCategory->getParent());
             $category = $category->withParent($parentId);
         }
-        return $category;
+        return CategoryDataSet::of([$category]);
     }
 
     public function withCategoryIdMapper(callable $fn): self

@@ -5,6 +5,7 @@ namespace SnowIO\AkeneoFredhopper;
 use SnowIO\AkeneoDataModel\AttributeOption as AkeneoAttributeOption;
 use SnowIO\FredhopperDataModel\AttributeData;
 use SnowIO\FredhopperDataModel\AttributeOption as FredhopperAttributeOption;
+use SnowIO\FredhopperDataModel\AttributeOptionSet;
 
 class AttributeOptionMapper
 {
@@ -13,12 +14,14 @@ class AttributeOptionMapper
         return new self;
     }
 
-    public function __invoke(AkeneoAttributeOption $attributeOption): FredhopperAttributeOption
+    public function __invoke(AkeneoAttributeOption $attributeOption): AttributeOptionSet
     {
         $attributeId = ($this->attributeIdMapper)($attributeOption->getAttributeCode());
         $valueId = ($this->valueIdMapper)($attributeOption->getOptionCode());
         $labels = ($this->displayValueMapper)($attributeOption->getLabels());
-        return FredhopperAttributeOption::of($attributeId, $valueId)->withDisplayValues($labels);
+        return AttributeOptionSet::of([
+            FredhopperAttributeOption::of($attributeId, $valueId)->withDisplayValues($labels)
+        ]);
     }
 
     public function withAttributeIdMapper(callable $fn): self
