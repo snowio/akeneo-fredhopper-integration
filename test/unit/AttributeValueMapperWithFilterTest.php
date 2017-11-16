@@ -12,59 +12,56 @@ use SnowIO\FredhopperDataModel\AttributeValueSet as FredhopperAttributeValueSet;
 
 class AttributeValueMapperWithFilterTest extends TestCase
 {
-    /**
-     * @dataProvider mapDataProvider
-     */
-    public function testMap(
-        AttributeValueMapperWithFilter $mapper,
-        AkeneoAttributeValueSet $akeneoAttributeValues,
-        FredhopperAttributeValueSet $expectedOutput
-    ) {
-        $actualOutput = $mapper($akeneoAttributeValues);
-        self::assertTrue($actualOutput->equals($expectedOutput));
+
+    public function testMapFilterWithSize()
+    {
+        $mapper = AttributeValueMapperWithFilter::of(
+            SimpleAttributeValueMapper::create(),
+            function (AkeneoAttributeValue $akeneoAttributeValue) {
+                return $akeneoAttributeValue->getAttributeCode() === 'size';
+            }
+        );
+
+        $akeneoAttributeValues = AkeneoAttributeValueSet::fromJson('main', [
+            'attribute_values' => [
+                'size' => 'large',
+                'price' => [
+                    'gbp' => '30',
+                    'eur' => '37.45',
+                ],
+                'weight' =>  '30'
+            ],
+        ]);
+
+        $expected = FredhopperAttributeValueSet::of([
+            FredhopperAttributeValue::of('size', 'large'),
+        ]);
+
+        $actual = $mapper($akeneoAttributeValues);
+        self::assertTrue($expected->equals($actual));
     }
 
-    public function mapDataProvider()
+    public function testMapFilterCanReturnEmptyDataSet()
     {
-        return [
-            'filterSize' => [
-                AttributeValueMapperWithFilter::of(
-                    SimpleAttributeValueMapper::create(),
-                    function (AkeneoAttributeValue $akeneoAttributeValue) {
-                        return $akeneoAttributeValue->getAttributeCode() === 'size';
-                    }
-                ),
-                AkeneoAttributeValueSet::fromJson('main', [
-                    'attribute_values' => [
-                        'size' => 'large',
-                        'price' => [
-                            'gbp' => '30',
-                            'eur' => '37.45',
-                        ],
-                        'weight' =>  '30'
-                    ],
-                ]),
-                FredhopperAttributeValueSet::of([
-                    FredhopperAttributeValue::of('size', 'large'),
-                ]),
+        $mapper = AttributeValueMapperWithFilter::of(
+            SimpleAttributeValueMapper::create(),
+            function (AkeneoAttributeValue $akeneoAttributeValue) {
+                return $akeneoAttributeValue->getAttributeCode() === 'size';
+            }
+        );
+
+        $akeneoAttributeValues = AkeneoAttributeValueSet::fromJson('main', [
+            'attribute_values' => [
+                'price' => [
+                    'gbp' => '30',
+                    'eur' => '37.45',
+                ],
             ],
-            'filterSizeWillReturnEmptyAttributeValueSet' => [
-                AttributeValueMapperWithFilter::of(
-                    SimpleAttributeValueMapper::create(),
-                    function (AkeneoAttributeValue $akeneoAttributeValue) {
-                        return $akeneoAttributeValue->getAttributeCode() === 'size';
-                    }
-                ),
-                AkeneoAttributeValueSet::fromJson('main', [
-                    'attribute_values' => [
-                        'price' => [
-                            'gbp' => '30',
-                            'eur' => '37.45',
-                        ],
-                    ],
-                ]),
-                FredhopperAttributeValueSet::of([]),
-            ],
-        ];
+        ]);
+
+        $expected = FredhopperAttributeValueSet::of([]);
+
+        $actual = $mapper($akeneoAttributeValues);
+        self::assertTrue($expected->equals($actual));
     }
 }

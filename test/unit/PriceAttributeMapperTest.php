@@ -13,87 +13,85 @@ use SnowIO\FredhopperDataModel\InternationalizedString;
 
 class PriceAttributeMapperTest extends TestCase
 {
-    /**
-     * @dataProvider mapDataProvider
-     */
-    public function testMap(
-        PriceAttributeMapper $mapper,
-        AkeneoAttribute $input,
-        AttributeDataSet $expectedOutput
-    ) {
-        $actualOutput = $mapper($input);
-        self::assertTrue($actualOutput->equals($expectedOutput));
+
+    public function testWithPriceType()
+    {
+        $mapper = PriceAttributeMapper::of([
+            'gbp',
+            'eur',
+        ]);
+        $actual = $mapper(AkeneoAttribute::fromJson([
+            'code' => 'price',
+            'type' => AkeneoAttributeType::PRICE_COLLECTION,
+            'localizable' => false,
+            'scopable' => false,
+            'sort_order' => 34,
+            'labels' => [
+                'en_GB' => 'Price',
+            ],
+            'group' => 'general',
+            '@timestamp' => 1508491122,
+        ]));
+
+        $expected = AttributeDataSet::of([
+            FredhopperAttribute::of(
+                'price_gbp',
+                FredhopperAttributeType::FLOAT,
+                InternationalizedString::create()->withValue('Price', 'en_GB')
+            ),
+            FredhopperAttribute::of(
+                'price_eur',
+                FredhopperAttributeType::FLOAT,
+                InternationalizedString::create()->withValue('Price', 'en_GB')
+            ),
+        ]);
+
+        self::assertTrue($expected->equals($actual));
     }
 
-    public function mapDataProvider()
+    public function testWithoutCurrencies()
     {
-        return [
-            'test-with-price-type' => [
-                PriceAttributeMapper::of([
-                    'gbp',
-                    'eur',
-                ]),
-                AkeneoAttribute::fromJson([
-                    'code' => 'price',
-                    'type' => AkeneoAttributeType::PRICE_COLLECTION,
-                    'localizable' => false,
-                    'scopable' => false,
-                    'sort_order' => 34,
-                    'labels' => [
-                        'en_GB' => 'Price',
-                    ],
-                    'group' => 'general',
-                    '@timestamp' => 1508491122,
-                ]),
-                AttributeDataSet::of([
-                    FredhopperAttribute::of(
-                        'price_gbp',
-                        FredhopperAttributeType::FLOAT,
-                        InternationalizedString::create()->withValue('Price', 'en_GB')
-                    ),
-                    FredhopperAttribute::of(
-                        'price_eur',
-                        FredhopperAttributeType::FLOAT,
-                        InternationalizedString::create()->withValue('Price', 'en_GB')
-                    ),
-                ]),
+        $mapper = PriceAttributeMapper::of([]);
+        $actual = $mapper(AkeneoAttribute::fromJson([
+            'code' => 'price',
+            'type' => AkeneoAttributeType::PRICE_COLLECTION,
+            'localizable' => false,
+            'scopable' => false,
+            'sort_order' => 34,
+            'labels' => [
+                'en_GB' => 'Price',
             ],
-            'without-currencies' => [
-                PriceAttributeMapper::of([]),
-                AkeneoAttribute::fromJson([
-                    'code' => 'price',
-                    'type' => AkeneoAttributeType::PRICE_COLLECTION,
-                    'localizable' => false,
-                    'scopable' => false,
-                    'sort_order' => 34,
-                    'labels' => [
-                        'en_GB' => 'Price',
-                    ],
-                    'group' => 'general',
-                    '@timestamp' => 1508491122,
-                ]),
-                AttributeDataSet::create(),
+            'group' => 'general',
+            '@timestamp' => 1508491122,
+        ]));
+        $expected = AttributeDataSet::create();
+        self::assertTrue($expected->equals($actual));
+    }
+
+    public function testWithNonPriceType()
+    {
+        $mapper = PriceAttributeMapper::of([
+            'gbp',
+            'eur',
+        ]);
+
+        $actual = $mapper(AkeneoAttribute::fromJson([
+            'code' => 'size',
+            'type' => AkeneoAttributeType::SIMPLESELECT,
+            'localizable' => true,
+            'scopable' => true,
+            'sort_order' => 34,
+            'labels' => [
+                'en_GB' => 'Size',
+                'fr_FR' => 'Taille',
             ],
-            'test-with-non-price-type' => [
-                PriceAttributeMapper::of([
-                    'gbp',
-                    'eur',
-                ]),
-                AkeneoAttribute::fromJson([
-                    'code' => 'size',
-                    'type' => AkeneoAttributeType::SIMPLESELECT,
-                    'localizable' => true,
-                    'scopable' => true,
-                    'sort_order' => 34,
-                    'labels' => [
-                        'en_GB' => 'Size',
-                        'fr_FR' => 'Taille',
-                    ],
-                    'group' => 'general',
-                    '@timestamp' => 1508491122,
-                ]),
-                AttributeDataSet::create(),
-            ],
-        ];
+            'group' => 'general',
+            '@timestamp' => 1508491122,
+        ]));
+
+        $expected = AttributeDataSet::create();
+
+        self::assertTrue($expected->equals($actual));
+
     }
 }

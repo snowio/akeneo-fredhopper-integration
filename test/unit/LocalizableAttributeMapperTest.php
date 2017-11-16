@@ -14,18 +14,6 @@ use SnowIO\FredhopperDataModel\InternationalizedString;
 class LocalizableAttributeMapperTest extends TestCase
 {
     /**
-     * @dataProvider mapDataProvider
-     */
-    public function testMap(
-        LocalizableAttributeMapper $mapper,
-        AkeneoAttributeData $input,
-        AttributeDataSet $expectedOutput
-    ) {
-        $actualOutput = $mapper($input);
-        self::assertTrue($actualOutput->equals($expectedOutput));
-    }
-
-    /**
      * @expectedException \InvalidArgumentException
      */
     public function testInvalidCreationOfMapper()
@@ -33,79 +21,87 @@ class LocalizableAttributeMapperTest extends TestCase
         LocalizableAttributeMapper::of([]);
     }
 
-    public function mapDataProvider()
+    public function testMapWithLocales()
     {
-        return [
-            'testWithLocales' => [
-                LocalizableAttributeMapper::of(['en_GB', 'fr_FR'])
-                    ->withTypeMapper(function (string $type) {
-                        return FredhopperAttributeType::LIST;
-                    }),
-                AkeneoAttributeData::fromJson([
-                    'code' => 'size',
-                    'type' => AkeneoAttributeType::SIMPLESELECT,
-                    'localizable' => true,
-                    'scopable' => true,
-                    'sort_order' => 34,
-                    'labels' => [
-                        'en_GB' => 'Size',
-                        'fr_FR' => 'Taille',
-                    ],
-                    'group' => 'general',
-                    '@timestamp' => 1508491122,
-                ]),
-                AttributeDataSet::of([
-                    FredhopperAttributeData::of(
-                        'size_en_gb',
-                        FredhopperAttributeType::LIST,
-                        InternationalizedString::create()
-                            ->withValue('Size', 'en_GB')
-                            ->withValue('Taille', 'fr_FR')
-                    ),
-                    FredhopperAttributeData::of(
-                        'size_fr_fr',
-                        FredhopperAttributeType::LIST,
-                        InternationalizedString::create()
-                            ->withValue('Size', 'en_GB')
-                            ->withValue('Taille', 'fr_FR')
-                    ),
-                ]),
+        $mapper = LocalizableAttributeMapper::of(['en_GB', 'fr_FR'])
+            ->withTypeMapper(function (string $type) {
+                return FredhopperAttributeType::LIST;
+            });
+
+        $attributeData = AkeneoAttributeData::fromJson([
+            'code' => 'size',
+            'type' => AkeneoAttributeType::SIMPLESELECT,
+            'localizable' => true,
+            'scopable' => true,
+            'sort_order' => 34,
+            'labels' => [
+                'en_GB' => 'Size',
+                'fr_FR' => 'Taille',
             ],
-            'testAutomaticLocales' => [
-                LocalizableAttributeMapper::create()->withTypeMapper(function (string $type) {
-                    return FredhopperAttributeType::LIST;
-                }),
-                AkeneoAttributeData::fromJson([
-                    'code' => 'size',
-                    'type' => AkeneoAttributeType::SIMPLESELECT,
-                    'localizable' => true,
-                    'scopable' => true,
-                    'sort_order' => 34,
-                    'labels' => [
-                        'en_GB' => 'Size',
-                        'fr_FR' => 'Taille',
-                    ],
-                    'group' => 'general',
-                    '@timestamp' => 1508491122,
-                ]),
-                AttributeDataSet::of([
-                    FredhopperAttributeData::of(
-                        'size_en_gb',
-                        FredhopperAttributeType::LIST,
-                        InternationalizedString::create()
-                            ->withValue('Size', 'en_GB')
-                            ->withValue('Taille', 'fr_FR')
-                    ),
-                    FredhopperAttributeData::of(
-                        'size_fr_fr',
-                        FredhopperAttributeType::LIST,
-                        InternationalizedString::create()
-                            ->withValue('Size', 'en_GB')
-                            ->withValue('Taille', 'fr_FR')
-                    ),
-                ]),
+            'group' => 'general',
+            '@timestamp' => 1508491122,
+        ]);
+
+        $expected = AttributeDataSet::of([
+            FredhopperAttributeData::of(
+                'size_en_gb',
+                FredhopperAttributeType::LIST,
+                InternationalizedString::create()
+                    ->withValue('Size', 'en_GB')
+                    ->withValue('Taille', 'fr_FR')
+            ),
+            FredhopperAttributeData::of(
+                'size_fr_fr',
+                FredhopperAttributeType::LIST,
+                InternationalizedString::create()
+                    ->withValue('Size', 'en_GB')
+                    ->withValue('Taille', 'fr_FR')
+            ),
+        ]);
+
+        $actual = $mapper($attributeData);
+        self::assertTrue($expected->equals($actual));
+    }
+
+    public function testAutomaticLocales()
+    {
+        $mapper = LocalizableAttributeMapper::create()->withTypeMapper(function (string $type) {
+            return FredhopperAttributeType::LIST;
+        });
+
+        $attributeData = AkeneoAttributeData::fromJson([
+            'code' => 'size',
+            'type' => AkeneoAttributeType::SIMPLESELECT,
+            'localizable' => true,
+            'scopable' => true,
+            'sort_order' => 34,
+            'labels' => [
+                'en_GB' => 'Size',
+                'fr_FR' => 'Taille',
             ],
-        ];
+            'group' => 'general',
+            '@timestamp' => 1508491122,
+        ]);
+
+        $expected = AttributeDataSet::of([
+            FredhopperAttributeData::of(
+                'size_en_gb',
+                FredhopperAttributeType::LIST,
+                InternationalizedString::create()
+                    ->withValue('Size', 'en_GB')
+                    ->withValue('Taille', 'fr_FR')
+            ),
+            FredhopperAttributeData::of(
+                'size_fr_fr',
+                FredhopperAttributeType::LIST,
+                InternationalizedString::create()
+                    ->withValue('Size', 'en_GB')
+                    ->withValue('Taille', 'fr_FR')
+            ),
+        ]);
+
+        $actual = $mapper($attributeData);
+        self::assertTrue($expected->equals($actual));
     }
 
 }

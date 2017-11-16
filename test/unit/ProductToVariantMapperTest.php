@@ -11,110 +11,108 @@ use SnowIO\FredhopperDataModel\VariantDataSet;
 
 class ProductToVariantMapperTest extends TestCase
 {
-    /**
-     * @dataProvider mapDataProvider
-     */
-    public function testMap(
-        ProductToVariantMapper $mapper,
-        AkeneoProductData $input,
-        VariantDataSet $expectedOutput
-    ) {
-        $actualOutput = $mapper($input);
-        self::assertTrue($actualOutput->equals($expectedOutput));
+    public function testMapVariantWithDefaultMappers()
+    {
+        $mapper = ProductToVariantMapper::create();
+        $actual = $mapper(AkeneoProductData::fromJson([
+            'sku' => 'abc123',
+            'channel' => 'main',
+            'categories' => [
+                ['mens', 't_shirts'],
+                ['mens', 'trousers'],
+            ],
+            'family' => "mens_t_shirts",
+            'attribute_values' => [
+                'size' => 'Large',
+            ],
+            'group' => "abc",
+            'localizations' => [],
+            'enabled' => true,
+            '@timestamp' => 1508491122,
+        ]));
+        $expected = VariantDataSet::of([FredhopperVariantData::of('v_abc123', 'abc')
+            ->withAttributeValue(AttributeValue::of('size', 'Large'))]);
+        self::assertTrue($expected->equals($actual));
     }
 
-    public function mapDataProvider()
+    public function testMapVariantWithCustomMappers()
     {
-        return [
-            'testVariantWithDefaultMappers' => [
-                ProductToVariantMapper::create(),
-                AkeneoProductData::fromJson([
-                    'sku' => 'abc123',
-                    'channel' => 'main',
-                    'categories' => [
-                        ['mens', 't_shirts'],
-                        ['mens', 'trousers'],
-                    ],
-                    'family' => "mens_t_shirts",
-                    'attribute_values' => [
-                        'size' => 'Large',
-                    ],
-                    'group' => "abc",
-                    'localizations' => [],
-                    'enabled' => true,
-                    '@timestamp' => 1508491122,
-                ]),
-                VariantDataSet::of([FredhopperVariantData::of('v_abc123', 'abc')->withAttributeValue(AttributeValue::of('size', 'Large'))]),
+        $mapper = ProductToVariantMapper::create()
+            ->withVariantGroupCodeToProductIdMapper(function (string $vgCode, string $channel) {
+                return "{$channel}_{$vgCode}";
+            });
+        $actual = $mapper(AkeneoProductData::fromJson([
+            'sku' => 'abc123',
+            'channel' => 'main',
+            'categories' => [
+                ['mens', 't_shirts'],
+                ['mens', 'trousers'],
             ],
-            'testVariantWithCustomMappers' => [
-                ProductToVariantMapper::create()
-                    ->withVariantGroupCodeToProductIdMapper(function (string $vgCode, string $channel) {
-                        return "{$channel}_{$vgCode}";
-                    }),
-                AkeneoProductData::fromJson([
-                    'sku' => 'abc123',
-                    'channel' => 'main',
-                    'categories' => [
-                        ['mens', 't_shirts'],
-                        ['mens', 'trousers'],
-                    ],
-                    'family' => "mens_t_shirts",
-                    'attribute_values' => [
-                        'size' => 'Large',
-                    ],
-                    'group' => "abc",
-                    'localizations' => [],
-                    'enabled' => true,
-                    '@timestamp' => 1508491122,
-                ]),
-                VariantDataSet::of([FredhopperVariantData::of('v_abc123', 'main_abc')->withAttributeValue(AttributeValue::of('size', 'Large'))]),
+            'family' => "mens_t_shirts",
+            'attribute_values' => [
+                'size' => 'Large',
             ],
-            'testStandaloneProductWithDefaultMappers' => [
-                ProductToVariantMapper::create(),
-                AkeneoProductData::fromJson([
-                    'sku' => 'abc123',
-                    'channel' => 'main',
-                    'categories' => [
-                        ['mens', 't_shirts'],
-                        ['mens', 'trousers'],
-                    ],
-                    'family' => "mens_t_shirts",
-                    'attribute_values' => [
-                        'size' => 'Large',
-                    ],
-                    'group' => null,
-                    'localizations' => [],
-                    'enabled' => true,
-                    '@timestamp' => 1508491122,
-                ]),
-                VariantDataSet::of([FredhopperVariantData::of('v_abc123', 'abc123')->withAttributeValue(AttributeValue::of('size', 'Large'))]),
+            'group' => "abc",
+            'localizations' => [],
+            'enabled' => true,
+            '@timestamp' => 1508491122,
+        ]));
+        $expected = VariantDataSet::of([FredhopperVariantData::of('v_abc123', 'main_abc')
+            ->withAttributeValue(AttributeValue::of('size', 'Large'))]);
+        self::assertTrue($expected->equals($actual));
+    }
+
+    public function testMapProductWithDefaultMappers()
+    {
+        $mapper = ProductToVariantMapper::create();
+        $actual = $mapper(AkeneoProductData::fromJson([
+            'sku' => 'abc123',
+            'channel' => 'main',
+            'categories' => [
+                ['mens', 't_shirts'],
+                ['mens', 'trousers'],
             ],
-            'testStandaloneProductWithCustomMappers' => [
-                ProductToVariantMapper::create()
-                    ->withSkuToProductIdMapper(function (string $sku, string $channel) {
-                        return "{$channel}_{$sku}";
-                    })
-                    ->withSkuToVariantIdMapper(function (string $sku, string $channel) {
-                        return "{$channel}_v_{$sku}";
-                    }),
-                AkeneoProductData::fromJson([
-                    'sku' => 'abc123',
-                    'channel' => 'main',
-                    'categories' => [
-                        ['mens', 't_shirts'],
-                        ['mens', 'trousers'],
-                    ],
-                    'family' => "mens_t_shirts",
-                    'attribute_values' => [
-                        'size' => 'Large',
-                    ],
-                    'group' => null,
-                    'localizations' => [],
-                    'enabled' => true,
-                    '@timestamp' => 1508491122,
-                ]),
-                VariantDataSet::of([FredhopperVariantData::of('main_v_abc123', 'main_abc123')->withAttributeValue(AttributeValue::of('size', 'Large'))]),
+            'family' => "mens_t_shirts",
+            'attribute_values' => [
+                'size' => 'Large',
             ],
-        ];
+            'group' => null,
+            'localizations' => [],
+            'enabled' => true,
+            '@timestamp' => 1508491122,
+        ]));
+        $expected = VariantDataSet::of([FredhopperVariantData::of('v_abc123', 'abc123')
+            ->withAttributeValue(AttributeValue::of('size', 'Large'))]);
+        self::assertTrue($expected->equals($actual));
+    }
+
+    public function testStandaloneProductWithCustomMappers()
+    {
+        $mapper = ProductToVariantMapper::create()
+            ->withSkuToProductIdMapper(function (string $sku, string $channel) {
+                return "{$channel}_{$sku}";
+            })
+            ->withSkuToVariantIdMapper(function (string $sku, string $channel) {
+                return "{$channel}_v_{$sku}";
+            });
+        $actual = $mapper(AkeneoProductData::fromJson([
+            'sku' => 'abc123',
+            'channel' => 'main',
+            'categories' => [
+                ['mens', 't_shirts'],
+                ['mens', 'trousers'],
+            ],
+            'family' => "mens_t_shirts",
+            'attribute_values' => [
+                'size' => 'Large',
+            ],
+            'group' => null,
+            'localizations' => [],
+            'enabled' => true,
+            '@timestamp' => 1508491122,
+        ]));
+        $expected = VariantDataSet::of([FredhopperVariantData::of('main_v_abc123', 'main_abc123')
+            ->withAttributeValue(AttributeValue::of('size', 'Large'))]);
+        self::assertTrue($expected->equals($actual));
     }
 }

@@ -50,10 +50,10 @@ class ProductEventCommandMapperTest extends CommandEventMapperTest
 
         $expected = SaveProductCommand::of(
             ProductData::of('abc123')
-            ->withCategoryId('tshirts')
-            ->withCategoryId('trousers')
-            ->withAttributeValue(AttributeValue::of('size', 'Large'))
-            ->withAttributeValue(AttributeValue::of('product_title', 'ABC 123 Product'))
+                ->withCategoryId('tshirts')
+                ->withCategoryId('trousers')
+                ->withAttributeValue(AttributeValue::of('size', 'Large'))
+                ->withAttributeValue(AttributeValue::of('product_title', 'ABC 123 Product'))
         )->withTimestamp(1508491122);
 
         $mapper = ProductEventCommandMapper::create($this->getFredhopperConfiguration());

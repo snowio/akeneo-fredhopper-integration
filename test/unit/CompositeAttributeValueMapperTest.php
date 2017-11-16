@@ -11,39 +11,29 @@ use SnowIO\FredhopperDataModel\AttributeValueSet as FredhopperAttributeValueSet;
 
 class CompositeAttributeValueMapperTest extends TestCase
 {
-    /**
-     * @dataProvider mapDataProvider
-     */
-    public function testMap(
-        CompositeAttributeValueMapper $mapper,
-        AkeneoAttributeValueSet $input,
-        FredhopperAttributeValueSet $expectedOutput
-    ) {
-        $actualOutput = $mapper($input);
-        self::assertTrue($actualOutput->equals($expectedOutput));
-    }
 
-    public function mapDataProvider()
+    public function testMap()
     {
-        return [
-            'with-simple-attribute-value-mappers' => [
-                CompositeAttributeValueMapper::create()
-                    ->with(SimpleAttributeValueMapper::create()),
-                AkeneoAttributeValueSet::fromJson('main', [
-                    'attribute_values' => [
-                        'size' => 'Large',
-                        'price' => [
-                            'gbp' => '30',
-                            'eur' => '37.45',
-                        ],
-                        'weight' => '30',
-                    ],
-                ]),
-                FredhopperAttributeValueSet::of([
-                    FredhopperAttributeValue::of('size', 'Large'),
-                    FredhopperAttributeValue::of('weight', '30'),
-                ]),
+        $mapper = CompositeAttributeValueMapper::create()
+            ->with(SimpleAttributeValueMapper::create());
+
+        $attributeValueSet = AkeneoAttributeValueSet::fromJson('main', [
+            'attribute_values' => [
+                'size' => 'Large',
+                'price' => [
+                    'gbp' => '30',
+                    'eur' => '37.45',
+                ],
+                'weight' => '30',
             ],
-        ];
+        ]);
+
+        $expected = FredhopperAttributeValueSet::of([
+            FredhopperAttributeValue::of('size', 'Large'),
+            FredhopperAttributeValue::of('weight', '30'),
+        ]);
+
+        $actual= $mapper($attributeValueSet);
+        self::assertTrue($expected->equals($actual));
     }
 }

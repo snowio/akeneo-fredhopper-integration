@@ -14,10 +14,8 @@ use SnowIO\FredhopperDataModel\InternationalizedString;
 
 class AttributeMapperWithFilterTest extends TestCase
 {
-    /**
-     * @dataProvider mapDataProvider
-     */
-    public function testMap(AkeneoAttributeData $akeneoAttribute, AttributeDataSet $expectedOutput)
+
+    public function testMapFilterByAttributeId()
     {
         $mapper = AttributeMapperWithFilter::of(
             StandardAttributeMapper::create(),
@@ -25,52 +23,56 @@ class AttributeMapperWithFilterTest extends TestCase
                 return $akeneoAttributeData->getCode() === 'size';
             }
         );
-        $actualOutput = $mapper($akeneoAttribute);
-        self::assertTrue($actualOutput->equals($expectedOutput));
+        $actual = $mapper(AkeneoAttributeData::fromJson([
+            'code' => 'size',
+            'type' => AkeneoAttributeType::SIMPLESELECT,
+            'localizable' => false,
+            'scopable' => true,
+            'sort_order' => 34,
+            'labels' => [
+                'en_GB' => 'Size',
+                'fr_FR' => 'Taille',
+            ],
+            'group' => 'general',
+            '@timestamp' => 1508491122,
+        ]));
+
+        $expected = AttributeDataSet::create()
+            ->with(FredhopperAttributeData::of(
+                'size',
+                FredhopperAttributeType::LIST,
+                InternationalizedString::create()
+                    ->withValue('Size', 'en_GB')
+                    ->withValue('Taille', 'fr_FR')
+            ));
+
+        self::assertTrue($expected->equals($actual));
     }
 
-    public function mapDataProvider()
+    public function testMapFilterByAttributeIdReturnsEmptyArray()
     {
-        return [
-            'testFilterByAttributeId' => [
-                AkeneoAttributeData::fromJson([
-                    'code' => 'size',
-                    'type' => AkeneoAttributeType::SIMPLESELECT,
-                    'localizable' => false,
-                    'scopable' => true,
-                    'sort_order' => 34,
-                    'labels' => [
-                        'en_GB' => 'Size',
-                        'fr_FR' => 'Taille',
-                    ],
-                    'group' => 'general',
-                    '@timestamp' => 1508491122,
-                ]),
-                AttributeDataSet::create()
-                    ->with(FredhopperAttributeData::of(
-                        'size',
-                        FredhopperAttributeType::LIST,
-                        InternationalizedString::create()
-                            ->withValue('Size', 'en_GB')
-                            ->withValue('Taille', 'fr_FR')
-                    )),
+        $mapper = AttributeMapperWithFilter::of(
+            StandardAttributeMapper::create(),
+            function (AkeneoAttributeData $akeneoAttributeData) {
+                return $akeneoAttributeData->getCode() !== 'size';
+            }
+        );
+        $actual = $mapper(AkeneoAttributeData::fromJson([
+            'code' => 'size',
+            'type' => AkeneoAttributeType::SIMPLESELECT,
+            'localizable' => false,
+            'scopable' => true,
+            'sort_order' => 34,
+            'labels' => [
+                'en_GB' => 'Size',
+                'fr_FR' => 'Taille',
             ],
-            'testFilterByAttributeIdReturnsEmptyArray' => [
-                AkeneoAttributeData::fromJson([
-                    'code' => 'color',
-                    'type' => AkeneoAttributeType::SIMPLESELECT,
-                    'localizable' => true,
-                    'scopable' => true,
-                    'sort_order' => 34,
-                    'labels' => [
-                        'en_GB' => 'Colour',
-                        'fr_FR' => 'Couleur',
-                    ],
-                    'group' => 'swatch',
-                    '@timestamp' => 1508491122,
-                ]),
-                AttributeDataSet::create(),
-            ],
-        ];
+            'group' => 'general',
+            '@timestamp' => 1508491122,
+        ]));
+
+        $expected = AttributeDataSet::create();
+
+        self::assertTrue($expected->equals($actual));
     }
 }

@@ -13,69 +13,59 @@ use SnowIO\FredhopperDataModel\ProductDataSet;
 
 class ProductToProductMapperTest extends TestCase
 {
-    /**
-     * @dataProvider mapDataProvider
-     */
-    public function testMap(
-        ProductToProductMapper $mapper,
-        AkeneoProductData $input,
-        ProductDataSet $expectedOutput
-    ) {
-        $actualOutput = $mapper($input);
-        self::assertTrue($actualOutput->equals($expectedOutput));
+    public function testMapWithDefaultMappers()
+    {
+        $mapper = ProductToProductMapper::create();
+        $actual = $mapper(AkeneoProductData::fromJson([
+            'sku' => 'abc123',
+            'channel' => 'main',
+            'categories' => [
+                ['mens', 't_shirts'],
+                ['mens', 'trousers'],
+            ],
+            'family' => "mens_t_shirts",
+            'attribute_values' => [
+                'size' => 'Large',
+            ],
+            'localizations' => [],
+            'enabled' => true,
+            '@timestamp' => 1508491122,
+        ]));
+        $expected = ProductDataSet::of([FredhopperProductData::of('abc123')
+            ->withCategoryIds(CategoryIdSet::of(['tshirts', 'trousers']))
+            ->withAttributeValue(AttributeValue::of('size', 'Large'))]);
+
+        self::assertTrue($expected->equals($actual));
     }
 
-    public function mapDataProvider()
+    public function testWithCustomMappers()
     {
-        return [
-            'testWithDefaultMappers' => [
-                ProductToProductMapper::create(),
-                AkeneoProductData::fromJson([
-                    'sku' => 'abc123',
-                    'channel' => 'main',
-                    'categories' => [
-                        ['mens', 't_shirts'],
-                        ['mens', 'trousers'],
-                    ],
-                    'family' => "mens_t_shirts",
-                    'attribute_values' => [
-                        'size' => 'Large',
-                    ],
-                    'localizations' => [],
-                    'enabled' => true,
-                    '@timestamp' => 1508491122,
-                ]),
-                ProductDataSet::of([FredhopperProductData::of('abc123')
-                    ->withCategoryIds(CategoryIdSet::of(['tshirts', 'trousers']))
-                    ->withAttributeValue(AttributeValue::of('size', 'Large'))]),
+        $mapper = ProductToProductMapper::create()
+            ->withCategoryIdMapper(function (string $categoryId) {
+                return CategoryData::sanitizeId($categoryId . '_mapped');
+            })
+            ->withProductIdMapper(function (string $sku) {
+                return $sku . '_mapped';
+            });
+        $actual = $mapper(AkeneoProductData::fromJson([
+            'sku' => 'abc123',
+            'channel' => 'main',
+            'categories' => [
+                ['mens', 't_shirts'],
+                ['mens', 'trousers'],
             ],
-            'testWithCustomMappers' => [
-                ProductToProductMapper::create()
-                    ->withCategoryIdMapper(function (string $categoryId) {
-                        return CategoryData::sanitizeId($categoryId . '_mapped');
-                    })
-                    ->withProductIdMapper(function (string $sku) {
-                        return $sku . '_mapped';
-                    }),
-                AkeneoProductData::fromJson([
-                    'sku' => 'abc123',
-                    'channel' => 'main',
-                    'categories' => [
-                        ['mens', 't_shirts'],
-                        ['mens', 'trousers'],
-                    ],
-                    'family' => "mens_t_shirts",
-                    'attribute_values' => [
-                        'size' => 'Large',
-                    ],
-                    'localizations' => [],
-                    'enabled' => true,
-                    '@timestamp' => 1508491122,
-                ]),
-                ProductDataSet::of([FredhopperProductData::of('abc123_mapped')
-                    ->withCategoryIds(CategoryIdSet::of(['tshirtsmapped', 'trousersmapped']))
-                    ->withAttributeValue(AttributeValue::of('size', 'Large'))]),
+            'family' => "mens_t_shirts",
+            'attribute_values' => [
+                'size' => 'Large',
             ],
-        ];
+            'localizations' => [],
+            'enabled' => true,
+            '@timestamp' => 1508491122,
+        ]));
+        $expected = ProductDataSet::of([FredhopperProductData::of('abc123_mapped')
+            ->withCategoryIds(CategoryIdSet::of(['tshirtsmapped', 'trousersmapped']))
+            ->withAttributeValue(AttributeValue::of('size', 'Large'))]);
+
+        self::assertTrue($expected->equals($actual));
     }
 }

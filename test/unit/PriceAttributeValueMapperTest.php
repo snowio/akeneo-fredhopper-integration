@@ -10,42 +10,37 @@ use SnowIO\AkeneoDataModel\AttributeValueSet as AkeneoAttributeValueSet;
 
 class PriceAttributeValueMapperTest extends TestCase
 {
-    /**
-     * @dataProvider mapDataProvider
-     */
-    public function testMap(AkeneoAttributeValueSet $input, FredhopperAttributeValueSet $expectedOutput)
+    public function testMap()
     {
-        $actualOutput = (PriceAttributeValueMapper::create())($input);
-        self::assertTrue($actualOutput->equals($expectedOutput));
+        $actual = (PriceAttributeValueMapper::create())(AkeneoAttributeValueSet::fromJson('main', [
+            'attribute_values' => [
+                'price' => [
+                    'gbp' => '30',
+                    'eur' => '37.45',
+                ],
+            ],
+        ]));
+
+        $expected = FredhopperAttributeValueSet::of([
+            FredhopperAttributeValue::of('price_gbp', '30'),
+            FredhopperAttributeValue::of('price_eur', '37.45'),
+        ]);
+
+        self::assertTrue($expected->equals($actual));
     }
 
-    public function mapDataProvider()
+
+    public function testMapWithNonPriceAttribute()
     {
-        return [
-            'priceAttribute' => [
-                AkeneoAttributeValueSet::fromJson('main', [
-                    'attribute_values' => [
-                        'price' => [
-                            'gbp' => '30',
-                            'eur' => '37.45',
-                        ],
-                    ],
-                ]),
-                FredhopperAttributeValueSet::of([
-                    FredhopperAttributeValue::of('price_gbp', '30'),
-                    FredhopperAttributeValue::of('price_eur', '37.45'),
-                ]),
+        $actual = (PriceAttributeValueMapper::create())(AkeneoAttributeValueSet::fromJson('main', [
+            'attribute_values' => [
+                'size' => 'large',
             ],
-            'nonPriceAttribute' => [
-                AkeneoAttributeValueSet::fromJson('main', [
-                    'attribute_values' => [
-                        'size' => 'large',
-                    ],
-                ]),
-                FredhopperAttributeValueSet::of([
-                    //todo should it return null for non price attributes
-                ]),
-            ]
-        ];
+        ]));
+
+        $expected = FredhopperAttributeValueSet::of([]);
+
+        self::assertTrue($expected->equals($actual));
     }
+
 }
