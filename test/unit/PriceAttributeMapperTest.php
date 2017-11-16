@@ -9,7 +9,8 @@ use SnowIO\AkeneoFredhopper\PriceAttributeMapper;
 use SnowIO\FredhopperDataModel\AttributeData as FredhopperAttribute;
 use SnowIO\FredhopperDataModel\AttributeDataSet;
 use SnowIO\FredhopperDataModel\AttributeType as FredhopperAttributeType;
-use SnowIO\FredhopperDataModel\InternationalizedString;
+use SnowIO\FredhopperDataModel\InternationalizedString as FredhopperInternationalizedString;
+use SnowIO\AkeneoDataModel\InternationalizedString as AkeneoInternationalizedString;
 
 class PriceAttributeMapperTest extends TestCase
 {
@@ -37,12 +38,53 @@ class PriceAttributeMapperTest extends TestCase
             FredhopperAttribute::of(
                 'price_gbp',
                 FredhopperAttributeType::FLOAT,
-                InternationalizedString::create()->withValue('Price', 'en_GB')
+                FredhopperInternationalizedString::create()->withValue('Price', 'en_GB')
             ),
             FredhopperAttribute::of(
                 'price_eur',
                 FredhopperAttributeType::FLOAT,
-                InternationalizedString::create()->withValue('Price', 'en_GB')
+                FredhopperInternationalizedString::create()->withValue('Price', 'en_GB')
+            ),
+        ]);
+
+        self::assertTrue($expected->equals($actual));
+    }
+
+    public function testWithNameMapper()
+    {
+        $mapper = PriceAttributeMapper::of([
+            'gbp',
+            'eur',
+        ])->withNameMapper(function (AkeneoInternationalizedString $akeneoInternationalisedString) {
+            $result = FredhopperInternationalizedString::create();
+            foreach ($akeneoInternationalisedString as $akeneoLocalizedString) {
+                $result = $result->withValue($akeneoLocalizedString->getValue() . '_test', $akeneoLocalizedString->getLocale());
+            }
+            return $result;
+        });
+        $actual = $mapper(AkeneoAttribute::fromJson([
+            'code' => 'price',
+            'type' => AkeneoAttributeType::PRICE_COLLECTION,
+            'localizable' => false,
+            'scopable' => false,
+            'sort_order' => 34,
+            'labels' => [
+                'en_GB' => 'Price',
+            ],
+            'group' => 'general',
+            '@timestamp' => 1508491122,
+        ]));
+
+        $expected = AttributeDataSet::of([
+            FredhopperAttribute::of(
+                'price_gbp',
+                FredhopperAttributeType::FLOAT,
+                FredhopperInternationalizedString::create()->withValue('Price_test', 'en_GB')
+            ),
+            FredhopperAttribute::of(
+                'price_eur',
+                FredhopperAttributeType::FLOAT,
+                FredhopperInternationalizedString::create()->withValue('Price_test', 'en_GB')
             ),
         ]);
 

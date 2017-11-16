@@ -72,7 +72,6 @@ class AttributeMapperWithFilterTest extends TestCase
         ]));
 
         $expected = AttributeDataSet::create();
-
         self::assertTrue($expected->equals($actual));
     }
 }
